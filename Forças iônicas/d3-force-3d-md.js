@@ -344,6 +344,9 @@ function charge$1(d) {
 function sigma$1(d){
   return d.sigma;
 }
+function epsilon$1(d){
+  return d.epsilon;
+}
 
 var initialRadius = 10,
     initialAngleRoll = Math.PI * (3 - Math.sqrt(5)), // Golden ratio angle
@@ -1051,9 +1054,9 @@ function lennardJonesPotential() {
     var i, 
     n = nodes.length,
     tree = 
-      (nDim === 1 ? d3Binarytree.binarytree(nodes, x$1, charge$1,sigma$1)
-      :(nDim === 2 ? d3Quadtree.quadtree(nodes, x$1, y$1, charge$1,sigma$1)
-      :(nDim === 3 ? d3Octree.octree(nodes, x$1, y$1, z$1, charge$1,sigma$1)
+      (nDim === 1 ? d3Binarytree.binarytree(nodes, x$1, charge$1,sigma$1,epsilon$1)
+      :(nDim === 2 ? d3Quadtree.quadtree(nodes, x$1, y$1, charge$1,sigma$1,epsilon$1)
+      :(nDim === 3 ? d3Octree.octree(nodes, x$1, y$1, z$1, charge$1,sigma$1,epsilon$1)
       :null
     ))).visitAfter(accumulate);
     for (alpha = _, i = 0; i < n; ++i) {
@@ -1077,14 +1080,16 @@ function lennardJonesPotential() {
 	var numChildren = treeNode.length;
 	var charge = 0;
   var sigma = 0;
-  var epsilon = 0;
+  var epsilon = 1;
     // For internal nodes, accumulate forces from child quadrants.
     if (numChildren) {
       for (x = y = z = i = 0; i < numChildren; ++i) { // original estah: for (x = y = i = 0; i < 4; ++i)
         if ((q = treeNode[i]) && (c = Math.abs(q.value))) {
           strength += q.value, weight += c, x += c * (q.x || 0), y += c * (q.y || 0), z += c * (q.z || 0);
-		      charge += c * (q.charge || 0)
-          console.log(q.sigma)
+		      charge += c * (q.charge) || 0
+          sigma += c * (q.sigma  || 0)
+          epsilon *= c * (q.epsilon)
+          console.log('charge ' +charge)
         }
       }
       strength *= Math.sqrt(4 / numChildren); // scale accumulated strength according to number of dimensions (d3-force-3d)
@@ -1092,8 +1097,12 @@ function lennardJonesPotential() {
       treeNode.x = x / weight;
       if (nDim > 1) { treeNode.y = y / weight; }
       if (nDim > 2) { treeNode.z = z / weight; }
-	  treeNode.charge = charge;
+	  treeNode.charge = charge || 0;
     treeNode.sigma = sigma/weight;
+    treeNode.epsilon = Math.pow(epsilon,(1/weight))
+    console.log('epsilon '+treeNode.epsilon)
+    console.log('sigma '+treeNode.sigma)
+    console.log('carga '+treeNode.charge)
     }
 
     // For leaf nodes, accumulate forces from coincident quadrants.
@@ -1104,7 +1113,9 @@ function lennardJonesPotential() {
       q.x = q.data.x;
       if (nDim > 1) { q.y = q.data.y; }
       if (nDim > 2) { q.z = q.data.z; }
-	  q.charge = atoms[q.data.name][atom_type].charge || 0;
+	  q.charge = atoms[q.data.name][atom_type].charge;
+    q.sigma = atoms[q.data.name][atom_type].sigma || 0;
+    q.epsilon = atoms[q.data.name][atom_type].epsilon;
       do strength += strengths[q.data.index];
       while (q = q.next);
     }
