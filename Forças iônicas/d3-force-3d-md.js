@@ -933,13 +933,13 @@ const atoms = {
     ['O']: {mass: 15.9994},
     ['F']: {mass: 18.998403},
     ['Ne']: {mass: 20.179},
-    ['Na']: {mass: 22.98977, ['DEFAULT']: {sigma: 2.950, epsilon: 0.331, charge: 1}},
+    ['Na']: {mass: 22.98977, ['DEFAULT']: {sigma: 2.032, epsilon: 18.71, charge: 1}},
     ['Mg']: {mass: 24.305},
     ['Al']: {mass: 26.98154},
     ['Si']: {mass: 28.0855},
     ['P']: {mass: 30.97376},
     ['S']: {mass: 32.06},
-    ['Cl']: {mass: 35.453,  ['DEFAULT']: {sigma: 3.626, epsilon:  1.035, charge: (-1)}},
+    ['Cl']: {mass: 35.453,  ['DEFAULT']: {sigma: 5.244, epsilon:  0.1750, charge: (-1)}},
     ['K']: {mass: 39.0983},
     ['Ar']: {mass: 39.948, ['DEFAULT']: {sigma: 3.4, epsilon: 0.0103}},
     ['Ca']: {mass: 40.08},
@@ -1047,7 +1047,7 @@ function lennardJonesPotential() {
       strengths,
       distanceMin2 = 0.75,
       distanceMax2 = Infinity,
-      theta2 = 0.0625, // lennard-jones type interactions mostly short-range
+      theta2 = 0.0625, //0.0625 lennard-jones type interactions mostly short-range
       N=12, M=6; // lennard-jones exponents
 
   function force(_) {
@@ -1089,7 +1089,8 @@ function lennardJonesPotential() {
 		      charge += c * (q.charge) || 0
           sigma += c * (q.sigma  || 0)
           epsilon *= c * (q.epsilon)
-          console.log('charge ' +charge)
+          //console.log('charge ' +charge)
+          //console.log(q.charge)
         }
       }
       strength *= Math.sqrt(4 / numChildren); // scale accumulated strength according to number of dimensions (d3-force-3d)
@@ -1097,12 +1098,12 @@ function lennardJonesPotential() {
       treeNode.x = x / weight;
       if (nDim > 1) { treeNode.y = y / weight; }
       if (nDim > 2) { treeNode.z = z / weight; }
-	  treeNode.charge = charge || 0;
-    treeNode.sigma = sigma/weight;
-    treeNode.epsilon = Math.pow(epsilon,(1/weight))
-    console.log('epsilon '+treeNode.epsilon)
-    console.log('sigma '+treeNode.sigma)
-    console.log('carga '+treeNode.charge)
+	    treeNode.charge = charge || 0;
+      treeNode.sigma = sigma/weight;
+      treeNode.epsilon = Math.pow(epsilon,(1/weight))
+      //console.log('epsilon '+treeNode.epsilon)
+      //console.log('sigma '+treeNode.sigma)
+      //console.log('carga '+treeNode.charge)
     }
 
     // For leaf nodes, accumulate forces from coincident quadrants.
@@ -1149,14 +1150,14 @@ function lennardJonesPotential() {
         const distance = Math.sqrt(l);
         const sigma = (atoms[node.name][atom_type].sigma + atoms[treeNode.name][treeNode_atom_type].sigma)/2;
         const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(atoms[treeNode.name][treeNode_atom_type].epsilon));
-        const qi = atoms[node.name][atom_type].charge;
-        const qj = atoms[treeNode.name][treeNode_atom_type].charge;
+        const qi = node.charge;
+        const qj = treeNode.charge;
         
         const e = 1.60217663 * 10**(-19)
         const epsilon_0 = 8.85 * 10**(-12);
         const pi = 3.14;
         force_prefactor = /*lj*/ (4 * epsilon * (N * Math.pow(sigma/distance, N) - M * Math.pow(sigma/distance, M))/distance) - /*charged*/ (qi*qj*e** 2) / ( 4*pi*epsilon_0*(distance**2));
-
+        console.log("aqui1" + (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance) - /*charged*/ (qi*qj*(e** 2)) / ( 4*pi*epsilon_0*(distance**2)))
         node.energy += (N*Math.pow(l,-M/2)-M*Math.pow(l,-N/2))/(M-N)*treeNode.value;
         node.force_x += force_prefactor*x*(1/distance)*alpha;
 		
@@ -1191,7 +1192,8 @@ function lennardJonesPotential() {
     const distance = Math.sqrt(l);
     const sigma = (atoms[node.name][atom_type].sigma + atoms[treeNode.name][treeNode_atom_type].sigma)/2;
     const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(atoms[treeNode.name][treeNode_atom_type].epsilon));
-    force_prefactor = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance) - /*charged*/ (qi*qj*e** 2) / ( 4*pi*epsilon_0*(distance**2)) ;
+    force_prefactor = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance) - /*charged*/ (qi*qj*(e** 2)) / ( 4*pi*epsilon_0*(distance**2)) ;
+    console.log("aqui" + ((4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance) - (qi*qj*(e** 2)) / ( 4*pi*epsilon_0*(distance**2))))
 
     do if (treeNode.data !== node) {
       w = strengths[treeNode.data.index];

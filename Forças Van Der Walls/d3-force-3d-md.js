@@ -1037,7 +1037,7 @@ function lennardJonesPotential() {
       strengths,
       distanceMin2 = 0.75,
       distanceMax2 = Infinity,
-      theta2 = 0.0625, // lennard-jones type interactions mostly short-range
+      theta2 = 2, //0.0625 lennard-jones type interactions mostly short-range
       N=12, M=6; // lennard-jones exponents
 
   function force(_) {
