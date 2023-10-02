@@ -1147,17 +1147,18 @@ function lennardJonesPotential() {
 
         const atom_type = node.type || 'DEFAULT';
         const treeNode_atom_type = treeNode.type || 'DEFAULT';
+        const epsilon_0 = 8.85 * 10**(-12);
+        const kappa = 3.32063711*10**2; // kcal*Ang/(mol*electron^2
+        const pi = Math.PI;
         const distance = Math.sqrt(l);
         const sigma = (atoms[node.name][atom_type].sigma + atoms[treeNode.name][treeNode_atom_type].sigma)/2;
         const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(atoms[treeNode.name][treeNode_atom_type].epsilon));
-        const qi = node.charge;
-        const qj = treeNode.charge;
-        
-        const e = 1.60217663 * 10**(-19)
-        const epsilon_0 = 8.85 * 10**(-12);
-        const pi = 3.14;
-        force_prefactor = /*lj*/ (4 * epsilon * (N * Math.pow(sigma/distance, N) - M * Math.pow(sigma/distance, M))/distance) - /*charged*/ (qi*qj*e** 2) / ( 4*pi*epsilon_0*(distance**2));
-        console.log("aqui1" + (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance) - /*charged*/ (qi*qj*(e** 2)) / ( 4*pi*epsilon_0*(distance**2)))
+        const lj_force = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance)
+        const el_force = (kappa*qi*qj) / (distance)**2;
+        force_prefactor = (+ lj_force + el_force)*0.001
+        const res = (+ lj_force + el_force)
+        res.toFixed(2)
+        console.log(res)
         node.energy += (N*Math.pow(l,-M/2)-M*Math.pow(l,-N/2))/(M-N)*treeNode.value;
         node.force_x += force_prefactor*x*(1/distance)*alpha;
 		
@@ -1188,12 +1189,20 @@ function lennardJonesPotential() {
     const qj = treeNode.charge;
     const e = 1.60217663 * 10**(-19)
     const epsilon_0 = 8.85 * 10**(-12);
-    const pi = 3.14;
+    const kappa = 3.32063711*10**2; // kcal*Ang/(mol*electron^2
+    const pi = Math.PI;
     const distance = Math.sqrt(l);
     const sigma = (atoms[node.name][atom_type].sigma + atoms[treeNode.name][treeNode_atom_type].sigma)/2;
     const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(atoms[treeNode.name][treeNode_atom_type].epsilon));
-    force_prefactor = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance) - /*charged*/ (qi*qj*(e** 2)) / ( 4*pi*epsilon_0*(distance**2)) ;
-    console.log("aqui" + ((4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance) - (qi*qj*(e** 2)) / ( 4*pi*epsilon_0*(distance**2))))
+    const lj_force = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance)
+    const el_force = (kappa*qi*qj) / (distance)**2;
+    const res = (+ lj_force + el_force)
+    if(res>=1000){
+      alert('alerta')
+    }
+    console.log(res.toFixed(2))
+    force_prefactor = (+ lj_force + el_force)*0.001
+    
 
     do if (treeNode.data !== node) {
       w = strengths[treeNode.data.index];
