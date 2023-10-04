@@ -77,7 +77,7 @@
             <div class="graph-info-msg"></div>
         </div>
     </div>
-
+	<script src="//unpkg.com/d3-force-bounce/dist/d3-force-bounce.min.js"></script>
     <script>
 		const N = 200;
 		const T = 300;
@@ -191,6 +191,14 @@
 			.nodeVal(function volume(i){return sigma[i.name]/20});
 			//.nodeTitle("name");
 		  
+
+			d3.forceSimulation()
+    .nodes(nodes)
+    .force('bounce', 
+	d3.forceBounce()
+    .radius(5)   
+	.elasticity(1)
+    );
     </script>
 </body>
 </html>
