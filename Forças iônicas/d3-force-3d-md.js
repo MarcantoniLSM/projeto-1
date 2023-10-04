@@ -1196,12 +1196,12 @@ function lennardJonesPotential() {
     const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(atoms[treeNode.name][treeNode_atom_type].epsilon));
     const lj_force = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance)
     const el_force = (kappa*qi*qj) / (distance)**2;
-    const res = (+ lj_force + el_force)
-    if(res>=1000){
-      alert('alerta')
+    let res = (+ lj_force + el_force)
+    if(res > 0.00000000000000000000000001){
+      res = 0.00000000000000000000000001
+      console.log(res)
     }
-    console.log(res.toFixed(2))
-    force_prefactor = (+ lj_force + el_force)*0.001
+    force_prefactor = res
     
 
     do if (treeNode.data !== node) {
