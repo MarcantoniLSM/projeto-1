@@ -1155,9 +1155,8 @@ function lennardJonesPotential() {
         const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(atoms[treeNode.name][treeNode_atom_type].epsilon));
         const lj_force = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance)
         const el_force = (kappa*qi*qj) / (distance)**2;
-        force_prefactor = (+ lj_force + el_force)*0.001
-        const res = (+ lj_force + el_force)
-        res.toFixed(2)
+        let res = (+ lj_force + el_force)
+        force_prefactor = res
         console.log(res)
         node.energy += (N*Math.pow(l,-M/2)-M*Math.pow(l,-N/2))/(M-N)*treeNode.value;
         node.force_x += force_prefactor*x*(1/distance)*alpha;
@@ -1195,14 +1194,17 @@ function lennardJonesPotential() {
     const sigma = (atoms[node.name][atom_type].sigma + atoms[treeNode.name][treeNode_atom_type].sigma)/2;
     const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(atoms[treeNode.name][treeNode_atom_type].epsilon));
     const lj_force = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance)
-    const el_force = (kappa*qi*qj) / (distance)**2;
-    let res = (+ lj_force + el_force)
-    if(res > 0.00000000000000000000000001){
-      res = 0.00000000000000000000000001
-      console.log(res)
+    let el_force = (kappa*qi*qj) / (distance)**2;
+
+    if(el_force<(-.001)){
+      el_force = -.001
+    }else if(el_force>.001){
+      el_force = .001
     }
+
+    var res = (+ lj_force + el_force)
     force_prefactor = res
-    
+    console.log("aqiu")
 
     do if (treeNode.data !== node) {
       w = strengths[treeNode.data.index];
