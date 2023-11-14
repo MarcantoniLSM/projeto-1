@@ -193,12 +193,11 @@
 		  
 
 			d3.forceSimulation()
-    .nodes(nodes)
-    .force('bounce', 
-	d3.forceBounce()
-    .radius(5)   
-	.elasticity(1)
-    .mass(22.98977));
+    		.nodes(nodes)
+			d3.forceCollide()
+			.radius(node => 4)
+			.strength(0.1)
+    
     </script>
 </body>
 </html>

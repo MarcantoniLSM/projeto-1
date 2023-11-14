@@ -353,6 +353,7 @@ var initialRadius = 10,
     initialAngleYaw = Math.PI * 20 / (9 + Math.sqrt(221)); // Markov irrational number
 
 function simulation(nodes, numDimensions) {
+  console.log('entrei')
   numDimensions = numDimensions || 2;
 
   var nDim = Math.min(MAX_DIMENSIONS, Math.max(1, Math.round(numDimensions))),
@@ -1204,7 +1205,7 @@ function lennardJonesPotential() {
 
     var res = (+ lj_force + el_force)
     force_prefactor = res
-    console.log("aqiu")
+    //console.log("aqiu")
 
     do if (treeNode.data !== node) {
       w = strengths[treeNode.data.index];
