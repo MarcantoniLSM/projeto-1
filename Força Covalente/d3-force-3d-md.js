@@ -96,7 +96,7 @@ function collide(radius) {
         zi,
         ri,
         ri2;
-		
+
     for (var k = 0; k < iterations; ++k) {
       tree =
           (nDim === 1 ? d3Binarytree.binarytree(nodes, x$2)
@@ -104,23 +104,15 @@ function collide(radius) {
           :(nDim === 3 ? d3Octree.octree(nodes, x$2, y$2, z$2)
           :null
       ))).visitAfter(prepare);
-      //console.log("bef: "+nodes[0].vx +" "+nodes[0].vy+" "+nodes[0].vz+" "+nodes[1].vx +" "+nodes[1].vy+" "+nodes[1].vz)
+
       for (i = 0; i < n; ++i) {
-		
         node = nodes[i];
         ri = radii[node.index], ri2 = ri * ri;
-        
-        xi = node.x + dt*(node.vx + (node.force_x + node.collf_x)*dt/node.mass) + node.coll_x ;//node.x + node.vx;
-        if (nDim > 1) { yi = node.y + dt*(node.vy + (node.force_y + node.collf_y)*dt/node.mass) + node.coll_y; }// node.y + node.vy; }
-        if (nDim > 2) { zi = node.z +dt*(node.vz + (node.force_z + node.collf_z)*dt/node.mass) + node.coll_z; }//node.z + node.vz; }
+        xi = node.x + node.vx;
+        if (nDim > 1) { yi = node.y + node.vy; }
+        if (nDim > 2) { zi = node.z + node.vz; }
         tree.visit(apply);
       }
-      //console.log("aft: "+nodes[0].vx +" "+nodes[0].vy+" "+nodes[0].vz+" "+nodes[1].vx +" "+nodes[1].vy+" "+nodes[1].vz)
-      /*if(node.coll_x != 0){
-        console.log(nodes[0].name+": "+nodes[0].x +" "+nodes[0].y +" "+nodes[0].z +" "+nodes[0].coll_x +" "+nodes[0].coll_y+" "+nodes[0].coll_z)
-        console.log(nodes[1].name+": "+nodes[1].x +" "+nodes[1].y +" "+nodes[1].z +" "+nodes[1].coll_x +" "+nodes[1].coll_y+" "+nodes[1].coll_z);
-        console.log("diff: "+(nodes[0].x-nodes[1].x)+" diffnc: "+(nodes[0].x + dt*(nodes[0].vx + nodes[0].force_x*dt/nodes[0].mass) -(nodes[1].x + dt*(nodes[1].vx + nodes[1].force_x*dt/nodes[1].mass)))+" diffc: "+(nodes[0].x + dt*(nodes[0].vx + nodes[0].force_x*dt/nodes[0].mass) + nodes[0].coll_x -(nodes[1].x + dt*(nodes[1].vx + nodes[1].force_x*dt/nodes[1].mass) + nodes[1].coll_x)));
-      }*/
     }
 
     function apply(treeNode, arg1, arg2, arg3, arg4, arg5, arg6) {
@@ -133,44 +125,25 @@ function collide(radius) {
           z1 = args[nDim+2];
 
       var data = treeNode.data, rj = treeNode.r, r = ri + rj;
-	  
       if (data) {
         if (data.index > node.index) {
-          var x = xi - (data.x +  dt*(data.vx + (data.force_x + data.collf_x)*dt/data.mass) + node.coll_x),
-              y = (nDim > 1 ? yi - (data.y +  dt*(data.vy + (data.force_y + data.collf_y)*dt/data.mass) + node.coll_y) : 0),
-              z = (nDim > 2 ? zi - (data.z +  dt*(data.vz + (data.force_z + data.collf_z)*dt/data.mass) + node.coll_z) : 0),
+          var x = xi - data.x - data.vx,
+              y = (nDim > 1 ? yi - data.y - data.vy : 0),
+              z = (nDim > 2 ? zi - data.z - data.vz : 0),
               l = x * x + y * y + z * z;
-			
           if (l < r * r) {
             if (x === 0) x = jiggle(random), l += x * x;
             if (nDim > 1 && y === 0) y = jiggle(random), l += y * y;
             if (nDim > 2 && z === 0) z = jiggle(random), l += z * z;
             l = (r - (l = Math.sqrt(l))) / l * strength;
-			//console.log("l:" + l+" r:" + r+" ri:" + ri+" rj:" + rj+" x:" + x+" y:" + y+" z:" + z);
-            /*
-            node.vx += (x *= l) * (r = (rj *= rj) / (ri2 + rj)) * 1/dt;
-            if (nDim > 1) { node.vy += (y *= l) * r * 1/dt; }
-            if (nDim > 2) { node.vz += (z *= l) * r * 1/dt; }
 
-            data.vx -= x * (r = 1 - r) * 1/dt;
-            if (nDim > 1) { data.vy -= y * r * 1/dt; }
-            if (nDim > 2) { data.vz -= z * r * 1/dt; }
-            */
-            node.coll_x += (x *= l) * (r = (rj *= rj) / (ri2 + rj));
-            if (nDim > 1) { node.coll_y += (y *= l) * r; }
-            if (nDim > 2) { node.coll_z += (z *= l) * r; }
-            
-            node.collf_x += data.force_x;
-            node.collf_y += data.force_y;
-            node.collf_z += data.force_z;
+            node.vx += (x *= l) * (r = (rj *= rj) / (ri2 + rj));
+            if (nDim > 1) { node.vy += (y *= l) * r; }
+            if (nDim > 2) { node.vz += (z *= l) * r; }
 
-            data.collf_x += node.force_x;
-            data.collf_y += node.force_y;
-            data.collf_z += node.force_z;
-
-            data.coll_x -= x * (r = 1 - r);
-            if (nDim > 1) { data.coll_y -= y * r; }
-            if (nDim > 2) { data.coll_z -= z * r; }
+            data.vx -= x * (r = 1 - r);
+            if (nDim > 1) { data.vy -= y * r; }
+            if (nDim > 2) { data.vz -= z * r; }
           }
         }
         return;
@@ -380,6 +353,7 @@ var initialRadius = 10,
     initialAngleYaw = Math.PI * 20 / (9 + Math.sqrt(221)); // Markov irrational number
 
 function simulation(nodes, numDimensions) {
+  console.log('entrei')
   numDimensions = numDimensions || 2;
 
   var nDim = Math.min(MAX_DIMENSIONS, Math.max(1, Math.round(numDimensions))),
@@ -433,24 +407,20 @@ function simulation(nodes, numDimensions) {
       for (i = 0; i < n; ++i) {
         node = nodes[i];
         
-        if (node.fx == null) node.x += dt*(node.vx *= velocityDecay) + node.coll_x;
+        if (node.fx == null) node.x += dt*(node.vx *= velocityDecay);
         else node.x = node.fx;
         if (nDim > 1){
-          if (node.fy == null) node.y += dt*(node.vy *= velocityDecay) + node.coll_y;
+          if (node.fy == null) node.y += dt*(node.vy *= velocityDecay);
           else node.y = node.fy;
         }
         if (nDim > 2){
-          if (node.fz == null) node.z += dt*(node.vz *= velocityDecay) + node.coll_z;
+          if (node.fz == null) node.z += dt*(node.vz *= velocityDecay);
           else node.z = node.fz;
         }
 		// restart force
 		node.force_x = 0;
 		node.force_y = 0;
 		node.force_z = 0;
-
-		node.coll_x = 0;
-		node.coll_y = 0;
-		node.coll_z = 0;
       }
 	  
       
@@ -934,7 +904,7 @@ function z(z) {
   return force;
 }
 
-var atoms = {
+const atoms = {
     ['H']: {mass: 1.00797},
     ['He']: {mass: 4.00260},
     ['Li']: {mass: 6.941},
@@ -1080,9 +1050,8 @@ function lennardJonesPotential() {
       distanceMax2 = Infinity,
       theta2 = 0.0625, //0.0625 lennard-jones type interactions mostly short-range
       N=12, M=6; // lennard-jones exponents
-  
+
   function force(_) {
-    //console.log("iteration")
     var i, 
     n = nodes.length,
     tree = 
@@ -1109,10 +1078,10 @@ function lennardJonesPotential() {
   function accumulate(treeNode) {
 	//console.log(treeNode);
     var strength = 0, q, c, weight = 0, x, y, z, i;
-    var numChildren = treeNode.length;
-    var charge = 0;
-    var sigma = 0;
-    var epsilon = 1;
+	var numChildren = treeNode.length;
+	var charge = 0;
+  var sigma = 0;
+  var epsilon = 1;
     // For internal nodes, accumulate forces from child quadrants.
     if (numChildren) {
       for (x = y = z = i = 0; i < numChildren; ++i) { // original estah: for (x = y = i = 0; i < 4; ++i)
@@ -1142,13 +1111,13 @@ function lennardJonesPotential() {
     else {
 	  
       q = treeNode;
-      const atom_type = q.data.type || 'DEFAULT';
+	  const atom_type = q.data.type || 'DEFAULT';
       q.x = q.data.x;
       if (nDim > 1) { q.y = q.data.y; }
       if (nDim > 2) { q.z = q.data.z; }
-      q.charge = atoms[q.data.name][atom_type].charge;
-      q.sigma = atoms[q.data.name][atom_type].sigma || 0;
-      q.epsilon = atoms[q.data.name][atom_type].epsilon;
+	  q.charge = atoms[q.data.name][atom_type].charge;
+    q.sigma = atoms[q.data.name][atom_type].sigma || 0;
+    q.epsilon = atoms[q.data.name][atom_type].epsilon;
       do strength += strengths[q.data.index];
       while (q = q.next);
     }
@@ -1159,13 +1128,13 @@ function lennardJonesPotential() {
   //function apply(treeNode, x1, _, x2) {
   function apply(treeNode, x1, arg1, arg2, arg3) {
 	  
-    //treeNode.name = node.name;
+    treeNode.name = node.name;
     if (!treeNode.value) return true;
     var x2 = [arg1, arg2, arg3][nDim-1];
     var x = (treeNode.x - node.x)*(-1),
         y = (nDim > 1 ? (treeNode.y - node.y)*(-1) : 0),
         z = (nDim > 2 ? (treeNode.z - node.z)*(-1) : 0),
-		    w = x2 - x1,
+		w = x2 - x1,
         l = x * x + y * y + z * z,
         force_prefactor;
     // Apply the Barnes-Hut approximation if possible.
@@ -1182,15 +1151,14 @@ function lennardJonesPotential() {
         const epsilon_0 = 8.85 * 10**(-12);
         const kappa = 3.32063711*10**2; // kcal*Ang/(mol*electron^2
         const pi = Math.PI;
-        var distance = Math.sqrt(l);
-        const sigma = (atoms[node.name][atom_type].sigma + treeNode.sigma)/2;
-        const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(treeNode.epsilon));
-        if (distance < (2**(1/6)*sigma)*2) distance = 2**(1/6)*sigma*2;
+        const distance = Math.sqrt(l);
+        const sigma = (atoms[node.name][atom_type].sigma + atoms[treeNode.name][treeNode_atom_type].sigma)/2;
+        const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(atoms[treeNode.name][treeNode_atom_type].epsilon));
         const lj_force = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance)
         const el_force = (kappa*qi*qj) / (distance)**2;
         let res = (+ lj_force + el_force)
         force_prefactor = res
-        //console.log(node.name + " h1 " + el_force);
+        console.log(res)
         node.energy += (N*Math.pow(l,-M/2)-M*Math.pow(l,-N/2))/(M-N)*treeNode.value;
         node.force_x += force_prefactor*x*(1/distance)*alpha;
 		
@@ -1211,38 +1179,35 @@ function lennardJonesPotential() {
       if (nDim > 2 && z === 0) z = jiggle(random), l += z * z;
       if (l < distanceMin2) l = Math.sqrt(distanceMin2 * l);
     }
-	do if (treeNode.data !== node) {
-		
-		// The type of the atom is assumed to be default if not specified.
-		const atom_type = node.type || 'DEFAULT';
-		const treeNode_atom_type = treeNode.type || 'DEFAULT';
-		//const qi = atoms[node.name][atom_type].charge;
-		const qi = node.charge;
-		//const qj = atoms[treeNode.name][treeNode_atom_type].charge;const qi = atoms[node.name][atom_type].charge;
-		const qj = treeNode.charge;
-		//const e = 1.60217663 * 10**(-19)
-		const epsilon_0 = 8.85 * 10**(-12);
-		const kappa = 3.32063711*10**2; // kcal*Ang/(mol*electron^2
-		const pi = Math.PI;
-		var distance = Math.sqrt(l);
-		const sigma = (atoms[node.name][atom_type].sigma + treeNode.sigma)/2;
-		const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(treeNode.epsilon));
-		//console.log(node.name + " "+ treeNode.name)
-		if (distance < (2**(1/6)*sigma*2)) {
-		  //console.log("here "+distance +" "+ 2**(1/6)*sigma*2)
-		  distance = 2**(1/6)*sigma*2;
-		  //console.log("here " + 2**(1/6)*sigma*2)
-		}
-		const lj_force = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance)
-		
-		const el_force = (kappa*qi*qj) / (distance)**2;
-		//console.log(node.name + " h2 " + el_force);
-		var res = (+ lj_force + el_force)
-		force_prefactor = res
-		//console.log("aqiu")
 
-    
-      //console.log(2**(1/6)*sigma*2 + " "+ distance + " " + res)
+    // The type of the atom is assumed to be default if not specified.
+    const atom_type = node.type || 'DEFAULT';
+    const treeNode_atom_type = treeNode.type || 'DEFAULT';
+    //const qi = atoms[node.name][atom_type].charge;
+    const qi = node.charge;
+    //const qj = atoms[treeNode.name][treeNode_atom_type].charge;const qi = atoms[node.name][atom_type].charge;
+    const qj = treeNode.charge;
+    const e = 1.60217663 * 10**(-19)
+    const epsilon_0 = 8.85 * 10**(-12);
+    const kappa = 3.32063711*10**2; // kcal*Ang/(mol*electron^2
+    const pi = Math.PI;
+    const distance = Math.sqrt(l);
+    const sigma = (atoms[node.name][atom_type].sigma + atoms[treeNode.name][treeNode_atom_type].sigma)/2;
+    const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(atoms[treeNode.name][treeNode_atom_type].epsilon));
+    const lj_force = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance)
+    let el_force = (kappa*qi*qj) / (distance)**2;
+
+    if(el_force<(-.001)){
+      el_force = -.001
+    }else if(el_force>.001){
+      el_force = .001
+    }
+
+    var res = (+ lj_force + el_force)
+    force_prefactor = res
+    //console.log("aqiu")
+
+    do if (treeNode.data !== node) {
       w = strengths[treeNode.data.index];
       node.energy += (N*Math.pow(l,-M/2)-M*Math.pow(l,-N/2))/(M-N)*w;
       node.force_x += force_prefactor*x*(1/distance)*alpha;
@@ -1255,7 +1220,7 @@ function lennardJonesPotential() {
   force.initialize = function(_nodes, ...args) {
     nodes = _nodes;
     random = args.find(arg => typeof arg === 'function') || Math.random;
-	  nDim = args.find(arg => [1, 2, 3].includes(arg)) || 2;
+	nDim = args.find(arg => [1, 2, 3].includes(arg)) || 2;
     initialize();
   };
 

@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
     
-    <div id="3d-graph">
+    <div id="graph-container">
         <div style="position: relative;">
             <div>
                 <div class="scene-container" style="position: relative; width: 1920px; height: 937px;">
@@ -19,7 +20,9 @@
             <div class="graph-info-msg"></div>
         </div>
     </div>
-    
+    <script src="3d-force-graph.js"></script>
+    <script src="d3-force-3d-md.js"></script>
+    <script src="d3-octree.min.js"></script>
     <script type="module" src="index.js"></script>
 </body>
 </html>

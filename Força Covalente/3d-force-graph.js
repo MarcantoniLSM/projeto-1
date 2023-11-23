@@ -34610,7 +34610,7 @@
 
 	  var nDim = Math.min(MAX_DIMENSIONS, Math.max(1, Math.round(numDimensions))),
 		  simulation,
-		  dt = 0.01,
+		  dt = 0.1,
 		  alpha = 1,
 		  alphaMin = 0.001,
 		  alphaDecay = 1 - Math.pow(alphaMin, 1 / 300),
@@ -34635,7 +34635,7 @@
 	  function tick(iterations) {
 		var i, n = nodes.length, node;
 
-		if (iterations === undefined) iterations = 100;
+		if (iterations === undefined) iterations = 10;
 		for (var k = 0; k < iterations; ++k) {
 		  alpha += (alphaTarget - alpha) * alphaDecay;
 		  
@@ -34643,14 +34643,14 @@
 		  for (i = 0; i < n; ++i) {
 			node = nodes[i];
 
-			if (node.fx == null) node.vx += 0.5*(node.force_x + node.collf_x)*dt/node.mass;
+			if (node.fx == null) node.vx += 0.5*node.force_x*dt/node.mass;
 			else node.vx = 0, node.force_x = 0, node.x = node.fx;
 			if (nDim > 1){
-			  if (node.fy == null) node.vy += 0.5*(node.force_y + node.collf_y)*dt/node.mass;
+			  if (node.fy == null) node.vy += 0.5*node.force_y*dt/node.mass;
 			  else node.vy = 0, node.force_y = 0, node.y = node.fy;
 			}
 			if (nDim > 2){
-			  if (node.fz == null) node.vz += 0.5*(node.force_z + node.collf_z)*dt/node.mass;
+			  if (node.fz == null) node.vz += 0.5*node.force_z*dt/node.mass;
 			  else node.vz = 0, node.force_z = 0, node.z = node.fz;
 			}
 		  }
@@ -34659,28 +34659,20 @@
 		  for (i = 0; i < n; ++i) {
 			node = nodes[i];
 			
-			if (node.fx == null) node.x += dt*(node.vx *= velocityDecay) + node.coll_x;
+			if (node.fx == null) node.x += dt*(node.vx *= velocityDecay);
 			else node.x = node.fx;
 			if (nDim > 1){
-			  if (node.fy == null) node.y += dt*(node.vy *= velocityDecay) + node.coll_y;
+			  if (node.fy == null) node.y += dt*(node.vy *= velocityDecay);
 			  else node.y = node.fy;
 			}
 			if (nDim > 2){
-			  if (node.fz == null) node.z += dt*(node.vz *= velocityDecay) + node.coll_z;
+			  if (node.fz == null) node.z += dt*(node.vz *= velocityDecay);
 			  else node.z = node.fz;
 			}
 			// restart force
 			node.force_x = 0;
 			node.force_y = 0;
 			node.force_z = 0;
-			
-			node.coll_x = 0;
-			node.coll_y = 0;
-			node.coll_z = 0;
-
-			node.collf_x = 0;
-			node.collf_y = 0;
-			node.collf_z = 0;
 		  }
 		  
 		  
@@ -34692,19 +34684,18 @@
 		  for (i = 0; i < n; ++i) {
 			node = nodes[i];
 			
-			if (node.fx == null) node.vx += 0.5*(node.force_x + node.collf_x)*dt/node.mass;
+			if (node.fx == null) node.vx += 0.5*node.force_x*dt/node.mass;
 			else node.vx = 0, node.force_x = 0, node.x = node.fx;
 			if (nDim > 1){
-			  if (node.fy == null) node.vy += 0.5*(node.force_y + node.collf_y)*dt/node.mass;
+			  if (node.fy == null) node.vy += 0.5*node.force_y*dt/node.mass;
 			  else node.vy = 0, node.force_y = 0, node.y = node.fy;
 			}
 			if (nDim > 2){
-			  if (node.fz == null) node.vz += 0.5*(node.force_z + node.collf_z)*dt/node.mass;
+			  if (node.fz == null) node.vz += 0.5*node.force_z*dt/node.mass;
 			  else node.vz = 0, node.force_z = 0, node.z = node.fz;
 			}
 		  }
-		  //console.log(nodes[0].vx +" "+nodes[0].force_x+" "+nodes[0].force_y+" "+nodes[0].force_z)
-		  //console.log(nodes[1].vx +" "+nodes[1].force_x+" "+nodes[1].force_y+" "+nodes[1].force_z)
+		  
 		  
 		}
 
