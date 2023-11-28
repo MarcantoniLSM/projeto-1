@@ -1,4 +1,4 @@
-import "./d3-force-3d-md.js";
+import './d3-force-3d-md.js'
 
 const node_data = [
   { id:0, x: 614.7594242356022, y: 118.22934282922354, r: 4.546777534949488 },
@@ -22,24 +22,8 @@ const nodes = node_data.map((d) => Object.create(d));
 
 // Create the ForceGraph3D instance
 const graph = ForceGraph3D()(document.getElementById('graph-container'));
+edges.forEach(link => {
+  d3.forceSimulation(`link-${link.source}-${link.target}`, d3.forceLink(edges).id(d => d.id).links([link]).distance(link.distance).strength(d3.linkForceHooke(link)));
+});
 
-graph
-//.d3Force("link", d3.forceLink(edges))
-
-// .d3Force('box', () => {
-			
-//     const CUBE_HALF_SIDE = Graph.nodeRelSize() * N * 0.25;
-
-//     nodes.forEach(node => {
-//       const x = node.x || 0, y = node.y || 0, z = node.z || 0;
-
-//       // bounce on box walls
-//       if (Math.abs(x) > CUBE_HALF_SIDE) { node.vx *= -1; }
-//       if (Math.abs(y) > CUBE_HALF_SIDE) { node.vy *= -1; }
-//       if (Math.abs(z) > CUBE_HALF_SIDE) { node.vz *= -1; }
-//     });
-//   })
-  //.nodeAutoColorBy("group")
-
-// Set the data
-.graphData({ nodes, links: edges });
+graph.graphData({ nodes, links: edges });
