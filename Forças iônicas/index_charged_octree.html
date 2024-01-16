@@ -195,7 +195,7 @@
 		    
 		  // Add collide force 
 		  .d3Force('collide', d3.forceCollide().radius( d => (2**(1/6))*atoms[d.name]['DEFAULT']['sigma']))
-		  
+		  .d3Force('link',d3.forceLink([]).id(d => d.id))
 		  
 		
 		  // Add nodes

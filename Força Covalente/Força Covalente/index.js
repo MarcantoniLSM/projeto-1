@@ -1,4 +1,4 @@
-import './d3-force-3d-md.js'
+//import './d3-force-3d-md.js'
 
 const node_data = [
   { id:0, x: 614.7594242356022, y: 118.22934282922354, r: 4.546777534949488 },
@@ -23,7 +23,11 @@ const nodes = node_data.map((d) => Object.create(d));
 // Create the ForceGraph3D instance
 const graph = ForceGraph3D()(document.getElementById('graph-container'));
 edges.forEach(link => {
-  d3.forceSimulation(`link-${link.source}-${link.target}`, d3.forceLink(edges).id(d => d.id).links([link]).distance(link.distance).strength(d3.linkForceHooke(link)));
+  d3.forceSimulation(node_data, 
+  d3.forceLink(edges).id(d => d.id).links([link])
+  .distance(link.distance)
+  .strength(d3.linkForceHooke(link))
+  );
 });
 
 graph.graphData({ nodes, links: edges });

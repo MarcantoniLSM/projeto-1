@@ -353,7 +353,6 @@ var initialRadius = 10,
     initialAngleYaw = Math.PI * 20 / (9 + Math.sqrt(221)); // Markov irrational number
 
 function simulation(nodes, numDimensions) {
-  console.log('entrei')
   numDimensions = numDimensions || 2;
 
   var nDim = Math.min(MAX_DIMENSIONS, Math.max(1, Math.round(numDimensions))),
@@ -1252,21 +1251,24 @@ function lennardJonesPotential() {
 }
 
 function hookeLaw(link){
-  const strength = 0.2; // Ajuste conforme necessário
-  return (d, i) => {
+  console.log('entrei')
+  const strength = 0.8; 
+
+    console.log('entrei 2')
     const source = nodes[link.source];
     const target = nodes[link.target];
+    console.log('source: ' + source)
+    console.log('target: ' + target)
     const dx = target.x - source.x;
     const dy = target.y - source.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const displacement = distance - link.distance; // Comprimento natural da mola
+    const displacement = distance - link.distance;
     const forceX = (displacement * dx) / distance * strength;
     const forceY = (displacement * dy) / distance * strength;
     source.vx += forceX;
     source.vy += forceY;
     target.vx -= forceX;
     target.vy -= forceY;
-  };
 }
 
 exports.forceCenter = center;
