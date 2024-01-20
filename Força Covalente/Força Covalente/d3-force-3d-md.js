@@ -1251,24 +1251,36 @@ function lennardJonesPotential() {
 }
 
 function hookeLaw(link){
-  console.log('entrei')
-  const strength = 0.8; 
 
-    console.log('entrei 2')
-    const source = nodes[link.source];
-    const target = nodes[link.target];
-    console.log('source: ' + source)
-    console.log('target: ' + target)
+  let k0 = 0 
+  let b0 = 0
+
+  const source = nodes[link.source];
+  const target = nodes[link.target];
+
+  if((source.type == 'ch3' && target.type == 'ch2') || (source.type == 'ch2' && target.type == 'ch3')){
+      k0 = 222.500
+      b0 = 1.5300
+
+    }else if((source.type == 'ch2' && target.type == 'ch2')){
+      k0 = 222.500
+      b0 = 1.5280
+    }
+
     const dx = target.x - source.x;
     const dy = target.y - source.y;
+
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const displacement = distance - link.distance;
-    const forceX = (displacement * dx) / distance * strength;
-    const forceY = (displacement * dy) / distance * strength;
+    const displacement = distance - b0;
+    const forceX = (displacement * dx) / distance * k0;
+    const forceY = (displacement * dy) / distance * k0;
     source.vx += forceX;
     source.vy += forceY;
     target.vx -= forceX;
     target.vy -= forceY;
+
+    console.log(source)
+    console.log(target)
 }
 
 exports.forceCenter = center;
