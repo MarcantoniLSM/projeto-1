@@ -203,6 +203,9 @@ function find(nodeById, nodeId) {
 }
 
 function link(links) {
+
+  console.log('link')
+
   var id = index,
       strength = defaultStrength,
       strengths,
@@ -222,6 +225,9 @@ function link(links) {
   }
 
   function force(alpha) {
+
+    console.log('force')
+
     for (var k = 0, n = links.length; k < iterations; ++k) {
       for (var i = 0, link, source, target, x = 0, y = 0, z = 0, l, b; i < n; ++i) {
         link = links[i], source = link.source, target = link.target;
@@ -244,6 +250,9 @@ function link(links) {
   }
 
   function initialize() {
+
+    console.log('initialize')
+
     if (!nodes) return;
 
     var i,
@@ -269,6 +278,9 @@ function link(links) {
   }
 
   function initializeStrength() {
+
+    console.log('initialize strength')
+
     if (!nodes) return;
 
     for (var i = 0, n = links.length; i < n; ++i) {
@@ -277,6 +289,10 @@ function link(links) {
   }
 
   function initializeDistance() {
+
+    console.log('initialize distance')
+
+    
     if (!nodes) return;
 
     for (var i = 0, n = links.length; i < n; ++i) {
@@ -1252,22 +1268,23 @@ function lennardJonesPotential() {
 
 function hookeLaw(link){
 
-  let k0 = 0 
-  let b0 = 0
+  console.log('aqui')
+  //let k0 = 0 
+  //let b0 = 0
 
   const source = nodes[link.source];
   const target = nodes[link.target];
 
   if((source.type == 'ch3' && target.type == 'ch2') || (source.type == 'ch2' && target.type == 'ch3')){
-      k0 = 222.500
-      b0 = 1.5300
+      return 222.500
+      //b0 = 1.5300
 
     }else if((source.type == 'ch2' && target.type == 'ch2')){
-      k0 = 222.500
-      b0 = 1.5280
+      return 222.500
+      //b0 = 1.5280
     }
 
-    const dx = target.x - source.x;
+    /*const dx = target.x - source.x;
     const dy = target.y - source.y;
 
     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -1280,7 +1297,7 @@ function hookeLaw(link){
     target.vy -= forceY;
 
     console.log(source)
-    console.log(target)
+    console.log(target)*/
 }
 
 exports.forceCenter = center;
@@ -1293,7 +1310,6 @@ exports.forceSimulation = simulation;
 exports.forceX = x;
 exports.forceY = y;
 exports.forceZ = z;
-exports.linkForceHooke = hookeLaw
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
