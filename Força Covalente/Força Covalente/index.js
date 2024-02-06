@@ -26,10 +26,7 @@ edges.forEach(link => {
   d3.forceSimulation(node_data, 
   d3.forceLink(edges).id(d => d.id)/*.links([link])
   .distance(link.distance)
-<<<<<<< HEAD
   .strength(d3.linkForceHooke(link))*/
-=======
->>>>>>> 2a1c4ebd910425858256a8175064f5671808244d
   );
 });
 
