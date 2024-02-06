@@ -213,7 +213,7 @@ function link(links) {
       count,
       bias,
       random,
-      iterations = 1;
+      iterations = 100;
 
   if (links == null) links = [];
 

@@ -24,9 +24,9 @@ const nodes = node_data.map((d) => Object.create(d));
 const graph = ForceGraph3D()(document.getElementById('graph-container'));
 edges.forEach(link => {
   d3.forceSimulation(node_data, 
-  d3.forceLink(edges).id(d => d.id).links([link])
+  d3.forceLink(edges).id(d => d.id)/*.links([link])
   .distance(link.distance)
-  .strength(d3.linkForceHooke(link))
+  .strength(d3.linkForceHooke(link))*/
   );
 });
 
