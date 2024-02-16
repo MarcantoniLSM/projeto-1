@@ -218,13 +218,18 @@ function link(links) {
       random,
       iterations = 100;
 
-  if (links == null) links = [];
+  if (links == null){
+    console.log(`if link`)
+    links = [];
+  } 
 
   function defaultStrength(link) {
+
+    console.log(`default strength`)
     return 1 / Math.min(count[link.source.index], count[link.target.index]);
   }
 
-  function force(alpha) {
+  function force() {
 
     console.log('force')
 
@@ -234,8 +239,17 @@ function link(links) {
         x = target.x + target.vx - source.x - source.vx || jiggle(random);
         if (nDim > 1) { y = target.y + target.vy - source.y - source.vy || jiggle(random); }
         if (nDim > 2) { z = target.z + target.vz - source.z - source.vz || jiggle(random); }
+        //b0 a definir
+        const b0 = 1.5380
+        //k a definir
+        k = 222.500
+        //distancia
         l = Math.sqrt(x * x + y * y + z * z);
-        l = (l - distances[i]) / l * alpha * strengths[i];
+        //displacement
+        let displacement = l - b0
+        //force
+        let force = k*displacement
+
         x *= l, y *= l, z *= l;
 
         target.vx -= x * (b = bias[i]);
@@ -248,7 +262,7 @@ function link(links) {
       }
     }
   }
-
+/*
   function initialize() {
 
     console.log('initialize')
@@ -275,8 +289,8 @@ function link(links) {
 
     strengths = new Array(m), initializeStrength();
     distances = new Array(m), initializeDistance();
-  }
-
+  }*/
+/*
   function initializeStrength() {
 
     console.log('initialize strength')
@@ -286,8 +300,8 @@ function link(links) {
     for (var i = 0, n = links.length; i < n; ++i) {
       strengths[i] = +strength(links[i], i, links);
     }
-  }
-
+  }*/
+/*
   function initializeDistance() {
 
     console.log('initialize distance')
@@ -298,34 +312,40 @@ function link(links) {
     for (var i = 0, n = links.length; i < n; ++i) {
       distances[i] = +distance(links[i], i, links);
     }
-  }
-
+  }*/
+/*
   force.initialize = function(_nodes, ...args) {
+    console.log(`force.initialize`)
     nodes = _nodes;
     random = args.find(arg => typeof arg === 'function') || Math.random;
     nDim = args.find(arg => [1, 2, 3].includes(arg)) || 2;
     initialize();
-  };
-
+  };*/
+/*
   force.links = function(_) {
+    console.log(`force.links`)
     return arguments.length ? (links = _, initialize(), force) : links;
-  };
+  };*/
 
   force.id = function(_) {
+    console.log(`force.id`)
     return arguments.length ? (id = _, force) : id;
   };
-
+/*
   force.iterations = function(_) {
+    console.log(`force.iterations`)
     return arguments.length ? (iterations = +_, force) : iterations;
-  };
-
+  };/*
+/*
   force.strength = function(_) {
+    console.log(`force.strength`)
     return arguments.length ? (strength = typeof _ === "function" ? _ : constant(+_), initializeStrength(), force) : strength;
-  };
+  };*/
 
-  force.distance = function(_) {
+  /*force.distance = function(_) {
+    console.log(`force.distance`)
     return arguments.length ? (distance = typeof _ === "function" ? _ : constant(+_), initializeDistance(), force) : distance;
-  };
+  };*/
 
   return force;
 }
