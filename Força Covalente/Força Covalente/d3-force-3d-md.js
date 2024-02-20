@@ -250,15 +250,18 @@ function link(links) {
         //force
         let force = k*displacement
 
-        x *= l, y *= l, z *= l;
+        source.forceX += (x/displacement)*force
+        target.forceX -= (x/displacement)*force
 
-        target.vx -= x * (b = bias[i]);
-        if (nDim > 1) { target.vy -= y * b; }
-        if (nDim > 2) { target.vz -= z * b; }
+        if (nDim > 1) { 
+          source.forceY += (y/displacement)*force
+          target.forceY -= (y/displacement)*force 
+        }
 
-        source.vx += x * (b = 1 - b);
-        if (nDim > 1) { source.vy += y * b; }
-        if (nDim > 2) { source.vz += z * b; }
+        if (nDim > 2) { 
+          source.forceZ += (z/displacement)*force
+          target.forceZ -= (z/displacement)*force 
+        }
       }
     }
   }
