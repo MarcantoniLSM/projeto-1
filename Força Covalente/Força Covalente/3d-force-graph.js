@@ -34291,25 +34291,38 @@
     }
 
     function force(alpha) {
-      for (var k = 0, n = links.length; k < iterations; ++k) {
-        for (var i = 0, link, source, target, x = 0, y = 0, z = 0, l, b; i < n; ++i) {
-          link = links[i], source = link.source, target = link.target;
-          x = target.x + target.vx - source.x - source.vx || jiggle(random);
-          if (nDim > 1) { y = target.y + target.vy - source.y - source.vy || jiggle(random); }
-          if (nDim > 2) { z = target.z + target.vz - source.z - source.vz || jiggle(random); }
-          l = Math.sqrt(x * x + y * y + z * z);
-          l = (l - distances[i]) / l * alpha * strengths[i];
-          x *= l, y *= l, z *= l;
 
-          target.vx -= x * (b = bias[i]);
-          if (nDim > 1) { target.vy -= y * b; }
-          if (nDim > 2) { target.vz -= z * b; }
-
-          source.vx += x * (b = 1 - b);
-          if (nDim > 1) { source.vy += y * b; }
-          if (nDim > 2) { source.vz += z * b; }
-        }
-      }
+		for (var k = 0, n = links.length; k < iterations; ++k) {
+		  for (var i = 0, link, source, target, x = 0, y = 0, z = 0, l, b; i < n; ++i) {
+			link = links[i], source = link.source, target = link.target;
+			x = target.x + target.vx - source.x - source.vx || jiggle(random);
+			if (nDim > 1) { y = target.y + target.vy - source.y - source.vy || jiggle(random); }
+			if (nDim > 2) { z = target.z + target.vz - source.z - source.vz || jiggle(random); }
+			//b0 a definir
+			const b0 = 1.5380
+			//k a definir
+			const k0 = 222.500
+			//distancia
+			let l = Math.sqrt(x * x + y * y + z * z);
+			//displacement
+			let displacement = l - b0
+			//force
+			let force = k0*displacement
+	
+			source.forceX += (Math.abs(x)/l)*force
+			target.forceX -= (Math.abs(x)/l)*force
+	
+			if (nDim > 1) { 
+			  source.forceY += (Math.abs(y)/l)*force
+			  target.forceY -= (Math.abs(y)/l)*force 
+			}
+	
+			if (nDim > 2) { 
+			  source.forceZ += (Math.abs(z)/l)*force
+			  target.forceZ -= (Math.abs(z)/l)*force 
+			}
+		  }
+		}
     }
 
     function initialize() {
