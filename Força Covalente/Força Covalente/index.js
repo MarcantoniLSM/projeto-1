@@ -31,4 +31,7 @@ edges.forEach(link => {
   );
 });
 
-graph.graphData({ nodes, links: edges });
+graph.graphData({ nodes, links: edges })
+.cooldownTime(Infinity)
+		  .d3AlphaDecay(0)
+		  .d3VelocityDecay(0);
