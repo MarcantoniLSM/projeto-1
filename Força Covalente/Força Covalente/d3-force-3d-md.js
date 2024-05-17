@@ -239,6 +239,8 @@ function link(links) {
         x = target.x + target.vx - source.x - source.vx || jiggle(random);
         if (nDim > 1) { y = target.y + target.vy - source.y - source.vy || jiggle(random); }
         if (nDim > 2) { z = target.z + target.vz - source.z - source.vz || jiggle(random); }
+
+        const consts = getBondConstants(source, target)
         //b0 a definir
         const b0 = 1.5380
         //k a definir
@@ -1076,6 +1078,131 @@ const atoms = {
     ['Uub']: {mass: (277)}
   };
 
+  bonds = {
+    ['NH2-CT1:']: {kb: 240.00, b0: 1.455},
+    ['CA-CA:']: {kb: 305.000, b0: 1.3750},
+    ['CE1-CE1:']: {kb: 440.000, b0: 1.3400},
+    ['CE1-CE2:']: {kb: 500.000, b0: 1.3420},
+    ['CE1-CT2:']: {kb: 365.000, b0: 1.5020},
+    ['CE1-CT3:']: {kb: 383.000, b0: 1.5040},
+    ['CE2-CE2:']: {kb: 510.000, b0: 1.3300},
+    ['CP1-C:']: {kb: 250.000, b0: 1.4900},
+    ['CP1-CC:']: {kb: 250.000, b0: 1.4900},
+    ['CP1-CD:']: {kb: 200.000, b0: 1.4900},
+    ['CP2-CP1:']: {kb: 222.500, b0: 1.5270},
+    ['CP2-CP2:']: {kb: 222.500, b0: 1.5370},
+    ['CP3-CP2:']: {kb: 222.500, b0: 1.5370},
+    ['CPH1-CPH1:']: {kb: 410.000, b0: 1.3600},
+    ['CPT-CA:']: {kb: 305.000, b0: 1.3680},
+    ['CPT-CPT:']: {kb: 360.000, b0: 1.4000},
+    ['CT1-C:']: {kb: 250.000, b0: 1.4900},
+    ['CT1-CC:']: {kb: 200.000, b0: 1.5220},
+    ['CT1-CD:']: {kb: 200.000, b0: 1.5220},
+    ['CT1-CT1:']: {kb: 222.500, b0: 1.5000},
+    ['CT2-C:']: {kb: 250.000, b0: 1.4900},
+    ['CT2-CA:']: {kb: 230.000, b0: 1.4900},
+    ['CT2-CC:']: {kb: 200.000, b0: 1.5220},
+    ['CT2-CD:']: {kb: 200.000, b0: 1.5220},
+    ['CT2-CPH1:']: {kb: 229.630, b0: 1.5000},
+    ['CT2-CT1:']: {kb: 222.500, b0: 1.5380},
+    ['CT2-CT2:']: {kb: 222.500, b0: 1.5300},
+    ['CT3-C:']: {kb: 250.000, b0: 1.4900},
+    ['CT3-CA:']: {kb: 230.000, b0: 1.4900},
+    ['CT3-CC:']: {kb: 200.000, b0: 1.5220},
+    ['CT3-CD:']: {kb: 200.000, b0: 1.5220},
+    ['CT3-CPH1:']: {kb: 229.630, b0: 1.5000},
+    ['CT3-CS:']: {kb: 190.000, b0: 1.5310},
+    ['CT3-CT1:']: {kb: 222.500, b0: 1.5380},
+    ['CT3-CT2:']: {kb: 222.500, b0: 1.5280},
+    ['CT3-CT3:']: {kb: 222.500, b0: 1.5300},
+    ['CY-CA:']: {kb: 350.000, b0: 1.3650},
+    ['CY-CPT:']: {kb: 350.000, b0: 1.4400},
+    ['CY-CT2:']: {kb: 230.000, b0: 1.5100},
+    ['H-CD:']: {kb: 330.000, b0: 1.1100},
+    ['HA-CA:']: {kb: 340.000, b0: 1.0830},
+    ['HA-CC:']: {kb: 317.130, b0: 1.1000},
+    ['HA-CP2:']: {kb: 309.000, b0: 1.1110},
+    ['HA-CP3:']: {kb: 309.000, b0: 1.1110},
+    ['HA-CS:']: {kb: 300.000, b0: 1.1110},
+    ['HA-CT1:']: {kb: 309.000, b0: 1.1110},
+    ['HA-CT2:']: {kb: 309.000, b0: 1.1110},
+    ['HA-CT3:']: {kb: 322.000, b0: 1.1110},
+    ['HA-CY:']: {kb: 330.000, b0: 1.0800},
+    ['HE1-CE1:']: {kb: 360.500, b0: 1.1000},
+    ['HE2-CE2:']: {kb: 365.000, b0: 1.1000},
+    ['HB-CP1:']: {kb: 330.000, b0: 1.0800},
+    ['HB-CT1:']: {kb: 330.000, b0: 1.0800},
+    ['HB-CT2:']: {kb: 330.000, b0: 1.0800},
+    ['HB-CT3:']: {kb: 330.000, b0: 1.0800},
+    ['HP-CA:']: {kb: 340.000, b0: 1.0800},
+    ['HP-CY:']: {kb: 350.000, b0: 1.0800},
+    ['HR1-CPH1:']: {kb: 375.000, b0: 1.0830},
+    ['HR1-CPH2:']: {kb: 340.000, b0: 1.0900},
+    ['HR2-CPH2:']: {kb: 333.000, b0: 1.0700},
+    ['HR3-CPH1:']: {kb: 365.000, b0: 1.0830},
+    ['N-C:']: {kb: 260.000, b0: 1.3000},
+    ['N-CP1:']: {kb: 320.000, b0: 1.4340},
+    ['N-CP3:']: {kb: 320.000, b0: 1.4550},
+    ['NC2-C:']: {kb: 463.000, b0: 1.3650},
+    ['NC2-CT2:']: {kb: 261.000, b0: 1.4900},
+    ['NC2-CT3:']: {kb: 261.000, b0: 1.4900},
+    ['NC2-HC:']: {kb: 455.000, b0: 1.0000},
+    ['NH1-C:']: {kb: 370.000, b0: 1.3450},
+    ['NH1-CT1:']: {kb: 320.000, b0: 1.4300},
+    ['NH1-CT2:']: {kb: 320.000, b0: 1.4300},
+    ['NH1-CT3:']: {kb: 320.000, b0: 1.4300},
+    ['NH1-H:']: {kb: 440.000, b0: 0.9970},
+    ['NH1-HC:']: {kb: 405.000, b0: 0.9800},
+    ['NH2-CC:']: {kb: 430.000, b0: 1.3600},
+    ['NH2-CT2:']: {kb: 240.000, b0: 1.4550},
+    ['NH2-CT3:']: {kb: 240.000, b0: 1.4550},
+    ['NH2-H:']: {kb: 480.000, b0: 1.0000},
+    ['NH2-HC:']: {kb: 460.000, b0: 1.0000},
+    ['NH3-CT1:']: {kb: 200.000, b0: 1.4800},
+    ['NH3-CT2:']: {kb: 200.000, b0: 1.4800},
+    ['NH3-CT3:']: {kb: 200.000, b0: 1.4800},
+    ['NH3-HC:']: {kb: 403.000, b0: 1.0400},
+    ['NP-CP1:']: {kb: 320.000, b0: 1.4850},
+    ['NP-CP3:']: {kb: 320.000, b0: 1.5020},
+    ['NP-HC:']: {kb: 460.000, b0: 1.0060},
+    ['NR1-CPH1:']: {kb: 400.000, b0: 1.3800},
+    ['NR1-CPH2:']: {kb: 400.000, b0: 1.3600},
+    ['NR1-H:']: {kb: 466.000, b0: 1.0000},
+    ['NR2-CPH1:']: {kb: 400.000, b0: 1.3800},
+    ['NR2-CPH2:']: {kb: 400.000, b0: 1.3200},
+    ['NR3-CPH1:']: {kb: 380.000, b0: 1.3700},
+    ['NR3-CPH2:']: {kb: 380.000, b0: 1.3200},
+    ['NR3-H:']: {kb: 453.000, b0: 1.0000},
+    ['NY-CA:']: {kb: 270.000, b0: 1.3700},
+    ['NY-CPT:']: {kb: 270.000, b0: 1.3750},
+    ['NY-H:']: {kb: 465.000, b0: 0.9760},
+    ['O-C:']: {kb: 620.000, b0: 1.2300},
+    ['O-CC:']: {kb: 650.000, b0: 1.2300},
+    ['OB-CC:']: {kb: 750.000, b0: 1.2200},
+    ['OB-CD:']: {kb: 750.000, b0: 1.2200},
+    ['OC-CA:']: {kb: 525.000, b0: 1.2600},
+    ['OC-CC:']: {kb: 525.000, b0: 1.2600},
+    ['OC-CT2:']: {kb: 450.000, b0: 1.3300},
+    ['OC-CT3:']: {kb: 450.000, b0: 1.3300},
+    ['OH1-CA:']: {kb: 334.300, b0: 1.4110},
+    ['OH1-CD:']: {kb: 230.000, b0: 1.4000},
+    ['OH1-CT1:']: {kb: 428.000, b0: 1.4200},
+    ['OH1-CT2:']: {kb: 428.000, b0: 1.4200},
+    ['OH1-CT3:']: {kb: 428.000, b0: 1.4200},
+    ['OH1-H:']: {kb: 545.000, b0: 0.9600},
+    ['OS-CD:']: {kb: 150.000, b0: 1.3340},
+    ['OS-CT3:']: {kb: 340.000, b0: 1.4300},
+    ['S-CT2:']: {kb: 198.000, b0: 1.8180},
+    ['S-CT3:']: {kb: 240.000, b0: 1.8160},
+    ['S-HS:']: {kb: 275.000, b0: 1.3250},
+    ['SM-CT2:']: {kb: 214.000, b0: 1.8160},
+    ['SM-CT3:']: {kb: 214.000, b0: 1.8160},
+    ['SM-SM:']: {kb: 173.000, b0: 2.0290},
+    ['SS-CS:']: {kb: 205.000, b0: 1.8360},
+    ['HR1-CD:']: {kb: 330.000, b0: 1.1100},
+    ['O-CD:']: {kb: 720.000, b0: 1.2050}
+    }
+
 function lennardJonesPotential() {
   var nodes,
       nDim,
@@ -1289,14 +1416,32 @@ function lennardJonesPotential() {
   return force;
 }
 
+function getBondConstants(bondA, bondB) {
+  console.log('bondA: ', bondA)
+  console.log('bondB: ', bondB)
+
+  const [bondX, bondY] = [bondA, bondB].sort();
+  const key = `${bondX}-${bondY}`;
+
+  console.log('key: ', key)
+
+  const constants = bonds[key];
+  if (constants) {
+    console.log(constants)
+  } else {
+    return { error: 'Bond key not found' };
+  }
+
+}
+
 function hookeLaw(link){
 
-  console.log('aqui')
-  //let k0 = 0 
-  //let b0 = 0
+  console.log(bonds)
 
   const source = nodes[link.source];
   const target = nodes[link.target];
+
+  getBondConstants(source.type, target.type)
 
   if((source.type == 'ch3' && target.type == 'ch2') || (source.type == 'ch2' && target.type == 'ch3')){
       return 222.500
@@ -1326,7 +1471,7 @@ function hookeLaw(link){
 exports.forceCenter = center;
 exports.forceCollide = collide;
 exports.forceLennardJones = lennardJonesPotential;
-exports.forceLink = link;
+exports.hookeLaw = link;
 exports.forceManyBody = manyBody;
 exports.forceRadial = radial;
 exports.forceSimulation = simulation;
