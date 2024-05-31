@@ -115,10 +115,29 @@
             {id: 2, "name":"Cl", "size":17, "charge":-1, "group": 2}
 					],*/
 			"nodes": [
-				{ "id": 0, "name": 'C', "x": 4.75, "y": 0, "z": 0, "group": 1, },
-				{ "id": 1, "name": 'C', "x": 6.5, "y": 0, "z": 0, "group": 2, },
+				{ "id": 0, "name": 'N', "type": "NH1", "x": 4.75, "y": 0, "z": 0, "group": 1, },
+				{ "id": 1, "name": 'HN', "type": "H", "x": 6.50, "y": 0, "z": 0, "group": 2, },
+				{ "id": 2, "name": "CA", "type": "CT1", "x":8.25, "ÿ":0, "z": 0, "group": 3},
+				{ "id": 3, "name": "HA", "type": "HB", "x":10.00, "ÿ":0, "z": 0, "group": 4},
+				{ "id": 4, "name": "CB", "type": "CT3", "x":11.75, "ÿ":0, "z": 0, "group": 5},
+				{ "id": 5, "name": "HB1", "type": "HA", "x":13.50, "ÿ":0, "z": 0, "group": 6},
+				{ "id": 6, "name": "HB2", "type": "HA", "x":15.25, "ÿ":0, "z": 0, "group": 6},
+				{ "id": 7, "name": "HB3", "type": "HA", "x":17.00, "ÿ":0, "z": 0, "group": 6},
+				{ "id": 8, "name": "C", "type": "C", "x":18.75, "ÿ":0, "z": 0, "group": 7},
+				{ "id": 9, "name": "O", "type": "O", "x":20.50, "ÿ":0, "z": 0, "group": 8},
 			],
-          "links": [{ "source": 0, "target": 1 }]
+          "links": [
+				{ "source": 4, "target": 2 },
+				{ "source": 0, "target": 1 },
+				{ "source": 0, "target": 2 },
+				{ "source": 8, "target": 2 },
+				{ "source": 8, "target": 0 }, // C - N+
+				{ "source": 2, "target": 3 },
+				{ "source": 4, "target": 5 },
+				{ "source": 4, "target": 6 },
+				{ "source": 4, "target": 7 },
+				{ "source": 8, "target": 9 }, // C = O
+		  ]
         };		
 		
 		let nodes = gData.nodes	

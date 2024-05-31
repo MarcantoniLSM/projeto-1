@@ -519,9 +519,9 @@ function simulation(nodes, numDimensions) {
 	  
 	  if (isNaN(node.charge)) node.charge = atoms[node.name][node.type]["charge"]; // mudei aqui!
 	  
-	  if (isNaN(node.epsilon)) node.epsilon = atoms[node.name][node.type]["epsilon"]; // mudei aqui!
+	  if (isNaN(node.epsilon)) node.epsilon = lennardJonesConsts[node.type].epsilon; // mudei aqui!
 	  
-	  if (isNaN(node.sigma)) node.sigma = atoms[node.name][node.type]["sigma"]; // mudei aqui!
+	  if (isNaN(node.sigma)) node.sigma = lennardJonesConsts[node.type].Rmin2; // mudei aqui!
 
     }
   }
@@ -1020,7 +1020,7 @@ function lennardJonesPotential() {
       if (nDim > 1) { q.y = q.data.y; }
       if (nDim > 2) { q.z = q.data.z; }
       q.charge = atoms[q.data.name][atom_type].charge || 0;
-      q.sigma = atoms[q.data.name][atom_type].sigma || 0;
+      q.sigma = lennardJonesConsts[q.data.type].Rmin2 || 0; //corrigir
       q.epsilon = atoms[q.data.name][atom_type].epsilon || 1;
       do strength += strengths[q.data.index];
       while (q = q.next);
@@ -1056,7 +1056,7 @@ function lennardJonesPotential() {
         const kappa = 3.32063711*10**2; // kcal*Ang/(mol*electron^2
         const pi = Math.PI;
         var distance = Math.sqrt(l);
-        const sigma = (atoms[node.name][atom_type].sigma + treeNode.sigma);
+        const sigma = (lennardJonesConsts[node.type].Rmin2 + treeNode.sigma);
         const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(treeNode.epsilon));
         if (distance < (2**(1/6)*sigma)*2) distance = 2**(1/6)*sigma*2; // minimal distance set to the 2*radius of an atom
         const lj_force = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance)
@@ -1100,7 +1100,7 @@ function lennardJonesPotential() {
 		const kappa = 3.32063711*10**2; // kcal*Ang/(mol*electron^2
 		const pi = Math.PI;
 		var distance = Math.sqrt(l);
-		const sigma = (atoms[node.name][atom_type].sigma + treeNode.sigma)/2;
+		const sigma = (lennardJonesConsts[node.type].Rmin2 + treeNode.sigma)/2;
 		const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(treeNode.epsilon));
 		//console.log(node.name + " "+ treeNode.name)
 		if (distance < (2**(1/6)*sigma*2)) {
@@ -1188,10 +1188,24 @@ function covalentLink(links) {
         x = target.x - source.x || jiggle(random);
 		if (nDim > 1) { y = target.y - source.y  || jiggle(random); }
 		if (nDim > 2) { z = target.z - source.z || jiggle(random); }
+
+    const [bondX, bondY] = [source.type, target.type].sort();
+        const key = `${bondX}-${bondY}`;
+      
+        console.log('key: ', key)
+
+        const constants = bonds[key];
+        if (constants) {
+          console.log(constants)
+          return constants
+        } else {
+          return { error: 'Bond key not found' };
+        }
+
 		//b0 a definir
-		const b0 = atoms['']
+		let b0 = constants.b0
 		//k a definir
-		const k0 = 222.500
+		const k0 = constants.kb
 		//distancia
 		let l = Math.sqrt(x * x + y * y + z * z);
 		//displacement
