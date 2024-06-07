@@ -117,14 +117,14 @@
 			"nodes": [
 				{ "id": 0, "name": 'N', "type": "NH1", "x": 4.75, "y": 0, "z": 0, "group": 1, },
 				{ "id": 1, "name": 'HN', "type": "H", "x": 6.50, "y": 0, "z": 0, "group": 2, },
-				{ "id": 2, "name": "CA", "type": "CT1", "x":8.25, "ÿ":0, "z": 0, "group": 3},
-				{ "id": 3, "name": "HA", "type": "HB", "x":10.00, "ÿ":0, "z": 0, "group": 4},
-				{ "id": 4, "name": "CB", "type": "CT3", "x":11.75, "ÿ":0, "z": 0, "group": 5},
-				{ "id": 5, "name": "HB1", "type": "HA", "x":13.50, "ÿ":0, "z": 0, "group": 6},
-				{ "id": 6, "name": "HB2", "type": "HA", "x":15.25, "ÿ":0, "z": 0, "group": 6},
-				{ "id": 7, "name": "HB3", "type": "HA", "x":17.00, "ÿ":0, "z": 0, "group": 6},
-				{ "id": 8, "name": "C", "type": "C", "x":18.75, "ÿ":0, "z": 0, "group": 7},
-				{ "id": 9, "name": "O", "type": "O", "x":20.50, "ÿ":0, "z": 0, "group": 8},
+				{ "id": 2, "name": "CA", "type": "CT1", "x":8.25, "y":0, "z": 0, "group": 3},
+				{ "id": 3, "name": "HA", "type": "HB", "x":10.00, "y":0, "z": 0, "group": 4},
+				{ "id": 4, "name": "CB", "type": "CT3", "x":11.75, "y":0, "z": 0, "group": 5},
+				{ "id": 5, "name": "HB1", "type": "HA", "x":13.50, "y":0, "z": 0, "group": 6},
+				{ "id": 6, "name": "HB2", "type": "HA", "x":15.25, "y":0, "z": 0, "group": 6},
+				{ "id": 7, "name": "HB3", "type": "HA", "x":17.00, "y":0, "z": 0, "group": 6},
+				{ "id": 8, "name": "C", "type": "C", "x":18.75, "y":0, "z": 0, "group": 7},
+				{ "id": 9, "name": "O", "type": "O", "x":20.50, "y":0, "z": 0, "group": 8},
 			],
           "links": [
 				{ "source": 4, "target": 2 },
@@ -150,7 +150,7 @@
 		  .d3VelocityDecay(0)
 		  
 		  // max number of ticks
-		  //.cooldownTicks(160)
+		  .cooldownTicks(160)
 		  /**/
 		  // callback after tick
 		  .onEngineTick(function(){
@@ -183,7 +183,7 @@
 			.nodeAutoColorBy("group")
 			//.nodeVal(function volume(i){return (4/3) *Math.Pi * sigma[i.name]**3});
 			.nodeVal(function(d){
-				r = (4/3)*Math.Pi*((2**(1/6))*atoms[d.name]['DEFAULT']['sigma'])**3;
+				r = (4/3)*Math.Pi*((2**(1/6))*lennardJonesConsts[d.type].Rmin2)**3;
             	return r;
 			})
 			//.nodeTitle("name");
@@ -192,7 +192,7 @@
 		  // Add covalent link force
 		  .d3Force('covlink',d3.forceCovalentLink(links1))
 		  // Add collide force 
-		  .d3Force('collide', d3.forceCollide().radius( d => (2**(1/6))*atoms[d.name]['DEFAULT']['sigma']))
+		  .d3Force('collide', d3.forceCollide().radius( d => (2**(1/6))*lennardJonesConsts[d.type].Rmin2))
 		  
 
 //			d3.forceSimulation()

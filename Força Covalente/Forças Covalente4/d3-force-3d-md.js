@@ -1019,9 +1019,9 @@ function lennardJonesPotential() {
       q.x = q.data.x;
       if (nDim > 1) { q.y = q.data.y; }
       if (nDim > 2) { q.z = q.data.z; }
-      q.charge = atoms[q.data.name][atom_type].charge || 0;
+      q.charge = lennardJonesConsts[q.data.type].charge || 0;
       q.sigma = lennardJonesConsts[q.data.type].Rmin2 || 0; //corrigir
-      q.epsilon = atoms[q.data.name][atom_type].epsilon || 1;
+      q.epsilon = lennardJonesConsts[q.data.type].epsilon || 1;
       do strength += strengths[q.data.index];
       while (q = q.next);
     }
@@ -1057,10 +1057,10 @@ function lennardJonesPotential() {
         const pi = Math.PI;
         var distance = Math.sqrt(l);
         const sigma = (lennardJonesConsts[node.type].Rmin2 + treeNode.sigma);
-        const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(treeNode.epsilon));
+        const epsilon = Math.sqrt((lennardJonesConsts[node.type].epsilon)*(treeNode.epsilon));
         if (distance < (2**(1/6)*sigma)*2) distance = 2**(1/6)*sigma*2; // minimal distance set to the 2*radius of an atom
         const lj_force = (4*epsilon*(N*Math.pow(sigma/distance, N)-M*Math.pow(sigma/distance, M))/distance)
-		const qi = atoms[node.name][atom_type].charge
+		const qi = lennardJonesConsts[node.type].charge
 		const qj = treeNode.charge
         const el_force = (kappa*qi*qj) / (distance)**2;
         let res = (+ lj_force + el_force)
@@ -1101,7 +1101,7 @@ function lennardJonesPotential() {
 		const pi = Math.PI;
 		var distance = Math.sqrt(l);
 		const sigma = (lennardJonesConsts[node.type].Rmin2 + treeNode.sigma)/2;
-		const epsilon = Math.sqrt((atoms[node.name][atom_type].epsilon)*(treeNode.epsilon));
+		const epsilon = Math.sqrt((lennardJonesConsts[node.type].epsilon)*(treeNode.epsilon));
 		//console.log(node.name + " "+ treeNode.name)
 		if (distance < (2**(1/6)*sigma*2)) {
 		  //console.log("here "+distance +" "+ 2**(1/6)*sigma*2)
@@ -1192,11 +1192,9 @@ function covalentLink(links) {
     const [bondX, bondY] = [source.type, target.type].sort();
         const key = `${bondX}-${bondY}`;
       
-        console.log('key: ', key)
 
         const constants = bonds[key];
         if (constants) {
-          console.log(constants)
         } else {
           console.log('Bond key not found' )
         }

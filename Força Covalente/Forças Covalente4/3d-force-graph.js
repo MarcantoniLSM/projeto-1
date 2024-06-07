@@ -34739,9 +34739,9 @@
 			}
 		  }
 		  if (isNaN(node.vx) || (nDim > 1 && isNaN(node.vy)) || (nDim > 2 && isNaN(node.vz))) {
-			node.vx = node.vx || init_velocity(T, atoms[node.name]["mass"]);
-			if (nDim > 1) { node.vy = node.vy || init_velocity(T, atoms[node.name]["mass"]); }
-			if (nDim > 2) { node.vz = node.vz || init_velocity(T, atoms[node.name]["mass"]); }
+			node.vx = node.vx || init_velocity(T, lennardJonesConsts[node.type].mass);
+			if (nDim > 1) { node.vy = node.vy || init_velocity(T, lennardJonesConsts[node.type].mass); }
+			if (nDim > 2) { node.vz = node.vz || init_velocity(T, lennardJonesConsts[node.type].mass); }
 		  }
 
 		  if (isNaN(node.force_x) || (nDim > 1 && isNaN(node.force_y)) || (nDim > 2 && isNaN(node.force_z))) {
@@ -34762,15 +34762,15 @@
         if (nDim > 2) { node.collf_z = node.collf_z || 0; }
       } // acrescentei aqui
 	  
-	  if (isNaN(node.type)) node.type = "DEFAULT"; // mudei aqui!
+	  //if (isNaN(node.type)) node.type = "DEFAULT"; // mudei aqui!
 	  
-      if (isNaN(node.mass)) node.mass = atoms[node.name]["mass"]; // mudei aqui!
+      if (isNaN(node.mass)) node.mass = lennardJonesConsts[node.type].mass; // mudei aqui!
 	  
-	  if (isNaN(node.charge)) node.charge = atoms[node.name][node.type]["charge"]; // mudei aqui!
+	  if (isNaN(node.charge)) node.charge = lennardJonesConsts[node.type].charge; // mudei aqui!
 	  
-	  if (isNaN(node.epsilon)) node.epsilon = atoms[node.name][node.type]["epsilon"]; // mudei aqui!
+	  if (isNaN(node.epsilon)) node.epsilon = lennardJonesConsts[node.type].epsilon; // mudei aqui!
 	  
-	  if (isNaN(node.sigma)) node.sigma = atoms[node.name][node.type]["sigma"]; // mudei aqui!
+	  if (isNaN(node.sigma)) node.sigma = lennardJonesConsts[node.type].Rmin2; // mudei aqui!
 
 
 		}
