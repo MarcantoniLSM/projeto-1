@@ -35,57 +35,57 @@
 !
 
 ATOMS
-MASS  -1  H          1.00800 ! polar H
-MASS  -1  HC         1.00800 ! N-ter H
-MASS  -1  HA         1.00800 ! nonpolar H
-MASS  -1  HP         1.00800 ! aromatic H
-MASS  -1  HB         1.00800 ! backbone H
-MASS  -1  HR1        1.00800 ! his he1, (+) his HG,HD2
-MASS  -1  HR2        1.00800 ! (+) his HE1
-MASS  -1  HR3        1.00800 ! neutral his HG, HD2
-MASS  -1  HS         1.00800 ! thiol hydrogen
-MASS  -1  HE1        1.00800 ! for alkene; RHC=CR
-MASS  -1  HE2        1.00800 ! for alkene; H2C=CR
-MASS  -1  C         12.01100 ! carbonyl C, peptide backbone
-MASS  -1  CA        12.01100 ! aromatic C
-MASS  -1  CT1       12.01100 ! aliphatic sp3 C for CH
-MASS  -1  CT2       12.01100 ! aliphatic sp3 C for CH2
-MASS  -1  CT3       12.01100 ! aliphatic sp3 C for CH3
-MASS  -1  CPH1      12.01100 ! his CG and CD2 carbons
-MASS  -1  CPH2      12.01100 ! his CE1 carbon
-MASS  -1  CPT       12.01100 ! trp C between rings
-MASS  -1  CY        12.01100 ! TRP C in pyrrole ring
-MASS  -1  CP1       12.01100 ! tetrahedral C (proline CA)
-MASS  -1  CP2       12.01100 ! tetrahedral C (proline CB/CG)
-MASS  -1  CP3       12.01100 ! tetrahedral C (proline CD)
-MASS  -1  CC        12.01100 ! carbonyl C, asn,asp,gln,glu,cter,ct2
-MASS  -1  CD        12.01100 ! carbonyl C, pres aspp,glup,ct1
-MASS  -1  CS        12.01100 ! thiolate carbon
-MASS  -1  CE1       12.01100 ! for alkene; RHC=CR
-MASS  -1  CE2       12.01100 ! for alkene; H2C=CR
-MASS  -1  C3        12.01100 ! cyclopropyl carbon
-MASS  -1  N         14.00700 ! proline N
-MASS  -1  NR1       14.00700 ! neutral his protonated ring nitrogen
-MASS  -1  NR2       14.00700 ! neutral his unprotonated ring nitrogen
-MASS  -1  NR3       14.00700 ! charged his ring nitrogen
-MASS  -1  NH1       14.00700 ! peptide nitrogen
-MASS  -1  NH2       14.00700 ! amide nitrogen
-MASS  -1  NH3       14.00700 ! ammonium nitrogen
-MASS  -1  NC2       14.00700 ! guanidinium nitroogen
-MASS  -1  NY        14.00700 ! TRP N in pyrrole ring
-MASS  -1  NP        14.00700 ! Proline ring NH2+ (N-terminal)
-MASS  -1  O         15.99900 ! carbonyl oxygen
-MASS  -1  OB        15.99900 ! carbonyl oxygen in acetic acid
-MASS  -1  OC        15.99900 ! carboxylate oxygen
-MASS  -1  OH1       15.99900 ! hydroxyl oxygen
-MASS  -1  OS        15.99940 ! ester oxygen
-MASS  -1  S         32.06000 ! sulphur
-MASS  -1  SM        32.06000 ! sulfur C-S-S-C type
-MASS  -1  SS        32.06000 ! thiolate sulfur
+H        mass:  1.00800, 
+HC       mass:  1.00800, 
+HA       mass:  1.00800, 
+HP       mass:  1.00800, 
+HB       mass:  1.00800, 
+HR1      mass:  1.00800, 
+HR2      mass:  1.00800,  
+HR3      mass:  1.00800,  
+HS       mass:  1.00800, 
+HE1      mass:  1.00800, 
+HE2      mass:  1.00800, 
+C        mass: 12.01100, 
+CA       mass: 12.01100, 
+CT1      mass: 12.01100,
+CT2      mass: 12.01100, 
+CT3      mass: 12.01100, 
+CPH1     mass: 12.01100, 
+CPH2     mass: 12.01100,  
+CPT      mass: 12.01100, 
+CY       mass: 12.01100, 
+CP1      mass: 12.01100, 
+CP2      mass: 12.01100, 
+CP3      mass: 12.01100, 
+CC       mass: 12.01100, 
+CD       mass: 12.01100, 
+CS       mass: 12.01100, 
+CE1      mass: 12.01100, 
+CE2      mass: 12.01100, 
+C3       mass: 12.01100, 
+N        mass: 14.00700,  
+NR1      mass: 14.00700,  
+NR2      mass: 14.00700, 
+NR3      mass: 14.00700,
+NH1      mass: 14.00700,
+NH2      mass: 14.00700,
+NH3      mass: 14.00700,
+NC2      mass: 14.00700,
+NY       mass: 14.00700,
+NP       mass: 14.00700,
+O        mass: 15.99900,
+OB       mass: 15.99900,
+OC       mass: 15.99900,
+OH1      mass: 15.99900,
+OS       mass: 15.99940,
+S        mass: 32.06000, 
+SM       mass: 32.06000,
+SS       mass: 32.06000,
 
 BONDS
 !
-!V(bond) = Kb(b - b0)**2
+,!V(bond) = Kb(b - b0)**2
 !
 !Kb: kcal/mole/A**2
 !b0: A

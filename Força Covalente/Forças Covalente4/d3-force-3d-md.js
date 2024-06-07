@@ -515,9 +515,9 @@ function simulation(nodes, numDimensions) {
         if (nDim > 2) { node.force_z = 0; }
       }
 
-      if (isNaN(node.mass)) node.mass = atoms[node.name]["mass"]; // mudei aqui!
+      if (isNaN(node.mass)) node.mass = lennardJonesConsts[node.type].mass; // mudei aqui!
 	  
-	  if (isNaN(node.charge)) node.charge = atoms[node.name][node.type]["charge"]; // mudei aqui!
+	  if (isNaN(node.charge)) node.charge = lennardJonesConsts[node.type].charge; // mudei aqui!
 	  
 	  if (isNaN(node.epsilon)) node.epsilon = lennardJonesConsts[node.type].epsilon; // mudei aqui!
 	  
@@ -1197,9 +1197,8 @@ function covalentLink(links) {
         const constants = bonds[key];
         if (constants) {
           console.log(constants)
-          return constants
         } else {
-          return { error: 'Bond key not found' };
+          console.log('Bond key not found' )
         }
 
 		//b0 a definir
