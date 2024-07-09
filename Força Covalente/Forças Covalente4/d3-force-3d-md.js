@@ -1297,10 +1297,181 @@ function covalentLink(links) {
   return force;
 }
 
+function angularLink(links){
+  var id = index,
+  strength = defaultStrength,
+  strengths,
+  distance = constant(30),
+  distances,
+  nodes,
+  nDim,
+  count,
+  bias,
+  random,
+  iterations = 1;
+
+  if (links == null) links = [];
+
+  function defaultStrength(link) {
+  return 1 / Math.min(count[link.source.index], count[link.target.index]);
+  }
+
+  function force(alpha) {
+  for (var k = 0, n = links.length; k < iterations; ++k) {
+    for (var i = 0, link, source, target, x = 0, y = 0, z = 0, l, b; i < n; ++i) {
+      link = links[i], source = link.source, target = link.target;
+      x = target.x - source.x || jiggle(random);
+  if (nDim > 1) { y = target.y - source.y  || jiggle(random); }
+  if (nDim > 2) { z = target.z - source.z || jiggle(random); }
+
+  //Falta selecionar a trinca de átomos
+
+  function findConnections(nodes, links) {
+    const connections = {};
+  
+    nodes.forEach(node => {
+      const id = node.id;
+  
+      const relatedObjects = links.filter(link => link.source.id === id || link.target.id === id);
+  
+      connections[id] = relatedObjects;
+    });
+  
+    return connections;
+  }
+  const result = findConnections(nodes, links)
+  
+  // Exemplo de uso
+  const array1 = [
+    { id: 1, name: 'Objeto 1' },
+    { id: 2, name: 'Objeto 2' },
+    { id: 3, name: 'Objeto 3' }
+  ];
+  
+  const array2 = [
+    { source: 1, target: 2 },
+    { source: 2, target: 3 },
+    { source: 3, target: 1 }
+  ];
+      
+  nodes.forEach(node => {
+    const id = node.id
+  });
+
+  //Trinca de átomos
+  const A = {x: 4.75, y: 0, z: 0, force_x: 0, force_y: 0, force_z: 0}
+  const B = {x: 4.75, y: 0, z: 0, force_x: 0, force_y: 0, force_z: 0}
+  const C = {x: 4.75, y: 0, z: 0, force_x: 0, force_y: 0, force_z: 0}
+  //Vetores relativos com o átomo do meio
+  const AB = {x: (A.x - B.x), y: (A.y - B.y), z: (A.z - B.z)}
+  const CB = {x: (C.x - B.x), y: (C.y - B.y), z: (C.z - B.z)}
+  //Força dos átomos da ponta, conferir se eles não podem ser nulos
+  const Fa = {x: A.force_x, y: A.force_y, z: A.force_z}
+  const Fc = {x: C.force_x, y: C.force_y, z: C.force_z}
+  //Fazendo o produto vetorial
+  const La = {x: (AB.y*Fa.z - AB.z*Fa.y), y: (AB.z*Fa.x - AB.x*Fa.z), z: (AB.x*Fa.y - AB.y*Fa.x)}
+  const Lc = {x: (CB.y*Fc.z - CB.z*Fc.y), y: (CB.z*Fc.x - CB.x*Fc.z), z: (CB.x*Fc.y - CB.y*Fc.x)}
+
+  A.force_x = La.x
+  A.force_y = La.y
+  A.force_z = La.z
+
+  C.force_x = Lc.x
+  C.force_y = Lc.y
+  C.force_z = Lc.z
+        
+  source.force_x += (x/l)*force
+  target.force_x -= (x/l)*force
+
+  if (nDim > 1) { 
+    source.force_y += (y/l)*force
+    target.force_y -= (y/l)*force 
+  }
+
+  if (nDim > 2) { 
+    source.force_z += (z/l)*force
+    target.force_z -= (z/l)*force 
+  }
+    }
+  }
+  }
+
+  function initialize() {
+  if (!nodes || nodes.length == 0) return;
+
+  var i,
+      n = nodes.length,
+      m = links.length,
+      nodeById = new Map(nodes.map((d, i) => [id(d, i, nodes), d])),
+      link;
+
+  for (i = 0, count = new Array(n); i < m; ++i) {
+    link = links[i], link.index = i;
+    if (typeof link.source !== "object") link.source = find(nodeById, link.source);
+    if (typeof link.target !== "object") link.target = find(nodeById, link.target);
+    count[link.source.index] = (count[link.source.index] || 0) + 1;
+    count[link.target.index] = (count[link.target.index] || 0) + 1;
+  }
+
+  for (i = 0, bias = new Array(m); i < m; ++i) {
+    link = links[i], bias[i] = count[link.source.index] / (count[link.source.index] + count[link.target.index]);
+  }
+
+  strengths = new Array(m), initializeStrength();
+  distances = new Array(m), initializeDistance();
+  }
+
+  function initializeStrength() {
+  if (!nodes) return;
+
+  for (var i = 0, n = links.length; i < n; ++i) {
+    strengths[i] = +strength(links[i], i, links);
+  }
+  }
+
+  function initializeDistance() {
+  if (!nodes) return;
+
+  for (var i = 0, n = links.length; i < n; ++i) {
+    distances[i] = +distance(links[i], i, links);
+  }
+  }
+
+  force.initialize = function(_nodes, ...args) {
+  nodes = _nodes;
+  random = args.find(arg => typeof arg === 'function') || Math.random;
+  nDim = args.find(arg => [1, 2, 3].includes(arg)) || 2;
+  initialize();
+  };
+
+  force.links = function(_) {
+  return arguments.length ? (links = _, initialize(), force) : links;
+  };
+
+  force.id = function(_) {
+  return arguments.length ? (id = _, force) : id;
+  };
+
+  force.iterations = function(_) {
+  return arguments.length ? (iterations = +_, force) : iterations;
+  };
+
+  force.strength = function(_) {
+  return arguments.length ? (strength = typeof _ === "function" ? _ : constant(+_), initializeStrength(), force) : strength;
+  };
+
+  force.distance = function(_) {
+  return arguments.length ? (distance = typeof _ === "function" ? _ : constant(+_), initializeDistance(), force) : distance;
+  };
+
+  return force;
+}
+
 exports.forceCenter = center;
 exports.forceCollide = collide;
 exports.forceLennardJones = lennardJonesPotential;
 exports.forceCovalentLink = covalentLink;
+exports.forceAngularLink = angularLink;
 exports.forceManyBody = manyBody;
 exports.forceRadial = radial;
 exports.forceSimulation = simulation;

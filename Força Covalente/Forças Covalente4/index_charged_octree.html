@@ -191,6 +191,7 @@
 		  .d3Force('lennard-jones', d3.forceLennardJones())
 		  // Add covalent link force
 		  .d3Force('covlink',d3.forceCovalentLink(links1))
+		  .d3Force('angularlink',d3.forceAngularLink(links1))
 		  // Add collide force 
 		  .d3Force('collide', d3.forceCollide().radius( d => (2**(1/6))*lennardJonesConsts[d.type].Rmin2))
 		  
