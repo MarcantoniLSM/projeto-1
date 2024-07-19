@@ -83,6 +83,7 @@
         </div>
     </div>
 	<!--<script src="//unpkg.com/d3-force-bounce/dist/d3-force-bounce.min.js"></script>-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.min.js"></script>
     <script>
 		const N = 200;
 		const T = 300;
@@ -191,7 +192,7 @@
 		  .d3Force('lennard-jones', d3.forceLennardJones())
 		  // Add covalent link force
 		  .d3Force('covlink',d3.forceCovalentLink(links1))
-		  .d3Force('angularlink',d3.forceAngularLink(links1))
+		  //.d3Force('angularlink',d3.forceAngularLink(links1))
 		  // Add collide force 
 		  .d3Force('collide', d3.forceCollide().radius( d => (2**(1/6))*lennardJonesConsts[d.type].Rmin2))
 		  
