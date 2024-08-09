@@ -34647,7 +34647,7 @@
 		  // update velocities (half-step)
 		  for (i = 0; i < n; ++i) {
 			node = nodes[i];
-
+			
 			if (node.fx == null) node.vx += 0.5*(node.force_x + node.collf_x)*dt/node.mass;
 			else node.vx = 0, node.force_x = 0, node.x = node.fx;
 			if (nDim > 1){

@@ -417,7 +417,7 @@ function simulation(nodes, numDimensions) {
       // update velocities (half-step)
       for (i = 0; i < n; ++i) {
         node = nodes[i];
-
+		
         if (node.fx == null) node.vx += 0.5*node.force_x*dt/node.mass;
         else node.vx = 0, node.force_x = 0, node.x = node.fx;
         if (nDim > 1){
@@ -1182,6 +1182,7 @@ function covalentLink(links) {
   }
 
   function force(alpha) {
+
     for (var k = 0, n = links.length; k < iterations; ++k) {
       for (var i = 0, link, source, target, x = 0, y = 0, z = 0, l, b; i < n; ++i) {
         link = links[i], source = link.source, target = link.target;
@@ -1297,7 +1298,7 @@ function covalentLink(links) {
   return force;
 }
 
-function angularLink(links){
+function angularLink(links, connections){
   var id = index,
   strength = defaultStrength,
   strengths,
@@ -1317,14 +1318,7 @@ function angularLink(links){
   }
 
   function force(alpha) {
-  for (var k = 0, n = links.length; k < iterations; ++k) {
-    for (var i = 0, link, source, target, x = 0, y = 0, z = 0, l, b; i < n; ++i) {
-      link = links[i], source = link.source, target = link.target;
-      x = target.x - source.x || jiggle(random);
-  if (nDim > 1) { y = target.y - source.y  || jiggle(random); }
-  if (nDim > 2) { z = target.z - source.z || jiggle(random); }
-
-
+  
 // Função para calcular o ângulo e os vetores de ligação
 function calculateAngle(rA, rB, rC) {
   const rAB = math.subtract(rB, rA);
@@ -1337,32 +1331,37 @@ function calculateAngle(rA, rB, rC) {
 // Função para calcular as forças
 function calculateForces(rA, rB, rC, kTheta, theta0) {
   const { theta, rAB, rBC } = calculateAngle(rA, rB, rC);
-
+  
   const dV_dtheta = kTheta * (theta - theta0);
   const sinTheta = Math.sin(theta);
 
   const norm_rAB = math.norm(rAB);
   const norm_rBC = math.norm(rBC);
+  
+  const dotProduct = math.dot(rAB, rBC);
 
+  const factorAB = dotProduct / (norm_rAB ** 3 * norm_rBC);
+  const factorBC = dotProduct / (norm_rBC ** 3 * norm_rAB);
+  
   const dcos_dAB = math.subtract(
     math.divide(rBC, norm_rAB * norm_rBC),
-    math.multiply(math.dot(rAB, rBC) / (norm_rAB ** 3 * norm_rBC), rAB)
+    math.multiply(factorAB, rAB)
   );
 
   const dcos_dBC = math.subtract(
     math.divide(rAB, norm_rAB * norm_rBC),
-    math.multiply(math.dot(rAB, rBC) / (norm_rBC ** 3 * norm_rAB), rBC)
+    math.multiply(factorBC, rBC)
   );
-
+  
   const F_A = math.multiply(-dV_dtheta / sinTheta, dcos_dAB);
   const F_C = math.multiply(-dV_dtheta / sinTheta, dcos_dBC);
-  const F_B = math.subtract(math.zeros(3), math.add(F_A, F_C));
+  const F_B = math.subtract([0,0,0], math.add(F_A, F_C));
 
   return { F_A, F_B, F_C };
 }
 
 // Função para encontrar conexões entre nós
-function findConnections(nodes, links) {
+/*function findConnections(nodes, links) {
   const connections = {};
   nodes.forEach(node => connections[node.id] = []);
   links.forEach(link => {
@@ -1371,64 +1370,77 @@ function findConnections(nodes, links) {
   });
   return connections;
 }
-
+*/
 // Função para aplicar forças angulares
-function applyAngularForces(nodes, links, kTheta, theta0) {
-  const connections = findConnections(nodes, links);
+function applyAngularForces(nodes, links) {
+  
+  //const connections = findConnections(nodes, links);
+  //const connections = {0: [1, 2], 1:[0], 2:[4, 0, 8, 3], 3:[2], 4:[2, 5, 6, 7], 5:[4], 6:[4], 7:[4], 8:[2, 9], 9:[8]};
+  
+  //start = performance.now();
+  for (var k = 0, n = links.length; k < iterations; ++k) {
+  for(var i in connections){
+  
+	  if(connections[i].length > 1){	  
+		  for(var j = 0; j < connections[i].length; ++j){
+			for(var k = j+1; k < connections[i].length; ++k){
+			  const A = nodes[connections[i][j]];
+			  const B = nodes[i];
+			  const C = nodes[connections[i][k]];
 
-  nodes.forEach((B, i) => {
-    if (connections[B.id].length > 1) {
-      connections[B.id].forEach((A_id, j) => {
-        connections[B.id].slice(j + 1).forEach(C_id => {
-          const A = nodes.find(node => node.id === A_id);
-          const C = nodes.find(node => node.id === C_id);
+        console.log('A: ', A)
+        console.log('B: ', B)
+        console.log('C: ', C)
 
-          // Posições dos átomos
-          const rA = [A.x, A.y, A.z];
-          const rB = [B.x, B.y, B.z];
-          const rC = [C.x, C.y, C.z];
+            // Extraindo os valores dos tipos das constantes
+    let partes = [A.type, B.type, C.type];
 
-          // Calcular forças angulares
-          const { F_A, F_B, F_C } = calculateForces(rA, rB, rC, kTheta, theta0);
+    // Ordenando em ordem alfabética
+    partes.sort();
 
-          // Aplicar forças
-          A.force_x += F_A[0];
-          A.force_y += F_A[1];
-          A.force_z += F_A[2];
+    // Unindo as partes com o hífen
+    const key = partes.join('-');
 
-          B.force_x += F_B[0];
-          B.force_y += F_B[1];
-          B.force_z += F_B[2];
+    const kTheta = angularConsts[key].Ktheta;
+    const theta0 = angularConsts[key].Theta0;
 
-          C.force_x += F_C[0];
-          C.force_y += F_C[1];
-          C.force_z += F_C[2];
-        });
-      });
-    }
-  });
+    console.log('kTheta :', kTheta)
+    console.log('theta0: ', theta0)
+			  
+			  // Posições dos átomos
+			  const rA = [A.x, A.y, A.z];
+			  const rB = [B.x, B.y, B.z];
+			  const rC = [C.x, C.y, C.z];
+			
+			// Calcular forças angulares
+			  const { F_A, F_B, F_C } = calculateForces(rA, rB, rC, kTheta, theta0);
+			
+			  // Aplicar forças
+			  A.force_x += F_A[0];
+			  A.force_y += F_A[1];
+			  A.force_z += F_A[2];
+
+			  B.force_x += F_B[0];
+			  B.force_y += F_B[1];
+			  B.force_z += F_B[2];
+
+			  C.force_x += F_C[0];
+			  C.force_y += F_C[1];
+			  C.force_z += F_C[2];
+			}
+		  }
+	  }
+	  
+  }
+  //end = performance.now();
+  //console.log(`Execution time (calculateForces): ${end - start} ms`);
+  }
 }
 
-const kTheta = 1.0;  // constante de força angular (arbitrária)
-const theta0 = Math.PI / 3;  // ângulo de equilíbrio (60 graus)
+console.log(connections)
 
-applyAngularForces(nodes, links, kTheta, theta0);
-  
-        
-  source.force_x += (x/l)*force
-  target.force_x -= (x/l)*force
+applyAngularForces(nodes, links);
 
-  if (nDim > 1) { 
-    source.force_y += (y/l)*force
-    target.force_y -= (y/l)*force 
-  }
-
-  if (nDim > 2) { 
-    source.force_z += (z/l)*force
-    target.force_z -= (z/l)*force 
-  }
-    }
-  }
   }
 
   function initialize() {

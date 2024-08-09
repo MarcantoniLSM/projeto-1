@@ -87,7 +87,7 @@
     <script>
 		const N = 200;
 		const T = 300;
-		const dt = 0.01;
+		const dt = 0.0001;
 				
 		const gData = {
          /*
@@ -132,14 +132,27 @@
 				{ "source": 0, "target": 1 },
 				{ "source": 0, "target": 2 },
 				{ "source": 8, "target": 2 },
-				{ "source": 8, "target": 0 }, // C - N+
+				//{ "source": 8, "target": 0 }, // C - N+
 				{ "source": 2, "target": 3 },
 				{ "source": 4, "target": 5 },
 				{ "source": 4, "target": 6 },
 				{ "source": 4, "target": 7 },
 				{ "source": 8, "target": 9 }, // C = O
 		  ]
-        };		
+        };
+		
+		function findConnections(nodes, links) {
+			const connections = {};
+			nodes.forEach(node => connections[node.id] = []);
+			links.forEach(link => {
+				console.log(link)
+				connections[link.source].push(link.target);
+				connections[link.target].push(link.source);
+			});
+			return connections;
+		}
+
+		const connections = findConnections(gData.nodes, gData.links)
 		
 		let nodes = gData.nodes	
 		let links1 = gData.links
@@ -151,7 +164,7 @@
 		  .d3VelocityDecay(0)
 		  
 		  // max number of ticks
-		  //.cooldownTicks(190)
+		  //.cooldownTicks(1)
 		  /**/
 		  // callback after tick
 		  .onEngineTick(function(){
@@ -192,7 +205,7 @@
 		  .d3Force('lennard-jones', d3.forceLennardJones())
 		  // Add covalent link force
 		  .d3Force('covlink',d3.forceCovalentLink(links1))
-		  //.d3Force('angularlink',d3.forceAngularLink(links1))
+		  .d3Force('angularlink',d3.forceAngularLink(links1, connections))
 		  // Add collide force 
 		  .d3Force('collide', d3.forceCollide().radius( d => (2**(1/6))*lennardJonesConsts[d.type].Rmin2))
 		  
