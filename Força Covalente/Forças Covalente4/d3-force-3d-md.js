@@ -1298,6 +1298,183 @@ function covalentLink(links) {
   return force;
 }
 
+function dihedralLink(links, connectionsDihedral){
+  var id = index,
+      strength = defaultStrength,
+      strengths,
+      distance = constant(30),
+      distances,
+      nodes,
+      nDim,
+      count,
+      bias,
+      random,
+      iterations = 1;
+
+  if (links == null) links = [];
+
+  function defaultStrength(link) {
+    return 1 / Math.min(count[link.source.index], count[link.target.index]);
+  }
+
+  function force(alpha) {
+
+    // Função para calcular o ângulo diedro
+    function calculateDihedralAngle(rA, rB, rC, rD) {
+      const rBA = math.subtract(rA, rB);
+      const rCB = math.subtract(rC, rB);
+      const rDC = math.subtract(rD, rC);
+
+      const n1 = math.cross(rBA, rCB);
+      const n2 = math.cross(rCB, rDC);
+
+      const cosPhi = math.dot(n1, n2) / (math.norm(n1) * math.norm(n2));
+      const sinPhi = math.dot(math.cross(n1, n2), rCB) / (math.norm(n1) * math.norm(n2) * math.norm(rCB));
+      
+      const phi = Math.atan2(sinPhi, cosPhi);
+      return { phi, n1, n2, rCB };
+    }
+
+    // Função para calcular as forças diedras
+    function calculateDihedralForces(rA, rB, rC, rD, kPhi, phi0) {
+      const { phi, n1, n2, rCB } = calculateDihedralAngle(rA, rB, rC, rD);
+
+      const dV_dphi = kPhi * (phi - phi0);
+
+      // As forças derivadas dos vetores normais e do vetor BC
+      const dcos_dBA = math.cross(rCB, n2);
+      const dcos_dDC = math.cross(rCB, n1);
+      
+      const F_A = math.multiply(-dV_dphi / math.norm(rCB), dcos_dBA);
+      const F_D = math.multiply(-dV_dphi / math.norm(rCB), dcos_dDC);
+      const F_BC = math.subtract([0,0,0], math.add(F_A, F_D));
+      
+      return { F_A, F_BC, F_D };
+    }
+
+    // Função para aplicar forças diedras
+    function applyDihedralForces(nodes, connectionsDihedral) {
+      for (var h = 0; h < iterations; ++h) {
+        for(var i in connectionsDihedral) {
+          const [A, B, C, D] = connectionsDihedral[i];
+          
+          // Extraindo os valores das constantes
+          let partes = [A.type, B.type, C.type, D.type];
+          partes.sort();
+          const key = partes.join('-');
+
+          // CONSTANTES PARA FORÇA DIEDRO
+          const Kchi = dihedralConsts[key].Kchi;  // <-- CONSTANTE DE FORÇA DIEDRO
+          const phi0 = Kchi * (1 + Math.cos(dihedralConsts[key].n - (dihedralConsts[key].delta * (Math.PI / 180))));  // <-- ÂNGULO DIEDRO EQUILÍBRIO
+
+          console.log('Kchi: ', Kchi)
+          console.log('phi0: ', phi0)
+          
+          // Posições dos átomos
+          const rA = [A.x, A.y, A.z];
+          const rB = [B.x, B.y, B.z];
+          const rC = [C.x, C.y, C.z];
+          const rD = [D.x, D.y, D.z];
+
+          // Calcular forças diedras
+          const { F_A, F_BC, F_D } = calculateDihedralForces(rA, rB, rC, rD, Kchi, phi0);
+          
+          // Aplicar forças
+          A.force_x += F_A[0];
+          A.force_y += F_A[1];
+          A.force_z += F_A[2];
+
+          B.force_x += F_BC[0];
+          B.force_y += F_BC[1];
+          B.force_z += F_BC[2];
+
+          C.force_x += F_BC[0];
+          C.force_y += F_BC[1];
+          C.force_z += F_BC[2];
+
+          D.force_x += F_D[0];
+          D.force_y += F_D[1];
+          D.force_z += F_D[2];
+        }
+      }
+    }
+
+    // Chama a função para aplicar as forças diedras
+    applyDihedralForces(nodes, connectionsDihedral);
+
+  }
+
+  function initialize() {
+  if (!nodes || nodes.length == 0) return;
+
+  var i,
+      n = nodes.length,
+      m = links.length,
+      nodeById = new Map(nodes.map((d, i) => [id(d, i, nodes), d])),
+      link;
+
+  for (i = 0, count = new Array(n); i < m; ++i) {
+    link = links[i], link.index = i;
+    if (typeof link.source !== "object") link.source = find(nodeById, link.source);
+    if (typeof link.target !== "object") link.target = find(nodeById, link.target);
+    count[link.source.index] = (count[link.source.index] || 0) + 1;
+    count[link.target.index] = (count[link.target.index] || 0) + 1;
+  }
+
+  for (i = 0, bias = new Array(m); i < m; ++i) {
+    link = links[i], bias[i] = count[link.source.index] / (count[link.source.index] + count[link.target.index]);
+  }
+
+  strengths = new Array(m), initializeStrength();
+  distances = new Array(m), initializeDistance();
+  }
+
+  function initializeStrength() {
+  if (!nodes) return;
+
+  for (var i = 0, n = links.length; i < n; ++i) {
+    strengths[i] = +strength(links[i], i, links);
+  }
+  }
+
+  function initializeDistance() {
+  if (!nodes) return;
+
+  for (var i = 0, n = links.length; i < n; ++i) {
+    distances[i] = +distance(links[i], i, links);
+  }
+  }
+
+  force.initialize = function(_nodes, ...args) {
+  nodes = _nodes;
+  random = args.find(arg => typeof arg === 'function') || Math.random;
+  nDim = args.find(arg => [1, 2, 3].includes(arg)) || 2;
+  initialize();
+  };
+
+  force.links = function(_) {
+  return arguments.length ? (links = _, initialize(), force) : links;
+  };
+
+  force.id = function(_) {
+  return arguments.length ? (id = _, force) : id;
+  };
+
+  force.iterations = function(_) {
+  return arguments.length ? (iterations = +_, force) : iterations;
+  };
+
+  force.strength = function(_) {
+  return arguments.length ? (strength = typeof _ === "function" ? _ : constant(+_), initializeStrength(), force) : strength;
+  };
+
+  force.distance = function(_) {
+  return arguments.length ? (distance = typeof _ === "function" ? _ : constant(+_), initializeDistance(), force) : distance;
+  };
+
+  return force;
+}
+
 function angularLink(links, connections){
   var id = index,
   strength = defaultStrength,
@@ -1378,7 +1555,7 @@ function applyAngularForces(nodes, links) {
   //const connections = {0: [1, 2], 1:[0], 2:[4, 0, 8, 3], 3:[2], 4:[2, 5, 6, 7], 5:[4], 6:[4], 7:[4], 8:[2, 9], 9:[8]};
   
   //start = performance.now();
-  for (var k = 0, n = links.length; k < iterations; ++k) {
+  for (var h = 0, n = links.length; h < iterations; ++h) {
   for(var i in connections){
   
 	  if(connections[i].length > 1){	  
@@ -1519,6 +1696,7 @@ exports.forceCollide = collide;
 exports.forceLennardJones = lennardJonesPotential;
 exports.forceCovalentLink = covalentLink;
 exports.forceAngularLink = angularLink;
+exports.forceDihedralLink = dihedralLink;
 exports.forceManyBody = manyBody;
 exports.forceRadial = radial;
 exports.forceSimulation = simulation;

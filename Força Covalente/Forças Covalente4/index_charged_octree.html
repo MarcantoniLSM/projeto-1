@@ -141,7 +141,7 @@
 		  ]
         };
 		
-		function findConnections(nodes, links) {
+		function findConnectionsAngular(nodes, links) {
 			const connections = {};
 			nodes.forEach(node => connections[node.id] = []);
 			links.forEach(link => {
@@ -152,7 +152,34 @@
 			return connections;
 		}
 
-		const connections = findConnections(gData.nodes, gData.links)
+		function findConnectionsDihedral(nodes, links, connections){
+			const dihedrals = []; // Array para armazenar as conexões diedrais
+
+			links.forEach(linkBC => {
+				const B = linkBC.source;
+				const C = linkBC.target;
+
+				// Percorre as conexões de B para encontrar A (que se conecta a B)
+				connections[B].forEach(A => {
+					if (A !== C) {
+						// Percorre as conexões de C para encontrar D (que se conecta a C)
+						connections[C].forEach(D => {
+							if (D !== B) {
+								// Encontra uma cadeia A-B-C-D
+								dihedrals.push([nodes[A], nodes[B], nodes[C], nodes[D]]);
+								console.log([nodes[A], nodes[B], nodes[C], nodes[D]]);
+							}
+						});
+					}
+				});
+			});
+
+			return dihedrals;
+		}
+
+
+		const connectionsAngular = findConnectionsAngular(gData.nodes, gData.links)
+		const connectionsDihedral = findConnectionsDihedral(gData.nodes, gData.links, connectionsAngular)
 		
 		let nodes = gData.nodes	
 		let links1 = gData.links
@@ -205,7 +232,8 @@
 		  .d3Force('lennard-jones', d3.forceLennardJones())
 		  // Add covalent link force
 		  .d3Force('covlink',d3.forceCovalentLink(links1))
-		  .d3Force('angularlink',d3.forceAngularLink(links1, connections))
+		  .d3Force('angularlink',d3.forceAngularLink(links1, connectionsAngular))
+		  .d3Force('dihedralLink', d3.forceDihedralLink(links1, connectionsDihedral))
 		  // Add collide force 
 		  .d3Force('collide', d3.forceCollide().radius( d => (2**(1/6))*lennardJonesConsts[d.type].Rmin2))
 		  
