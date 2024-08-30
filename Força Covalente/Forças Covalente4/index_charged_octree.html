@@ -145,7 +145,6 @@
 			const connections = {};
 			nodes.forEach(node => connections[node.id] = []);
 			links.forEach(link => {
-				console.log(link)
 				connections[link.source].push(link.target);
 				connections[link.target].push(link.source);
 			});
@@ -167,7 +166,6 @@
 							if (D !== B) {
 								// Encontra uma cadeia A-B-C-D
 								dihedrals.push([nodes[A], nodes[B], nodes[C], nodes[D]]);
-								console.log([nodes[A], nodes[B], nodes[C], nodes[D]]);
 							}
 						});
 					}

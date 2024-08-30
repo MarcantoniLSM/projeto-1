@@ -1355,27 +1355,48 @@ function dihedralLink(links, connectionsDihedral){
     // Função para aplicar forças diedras
     function applyDihedralForces(nodes, connectionsDihedral) {
       for (var h = 0; h < iterations; ++h) {
-        for(var i in connectionsDihedral) {
+        for (var i in connectionsDihedral) {
           const [A, B, C, D] = connectionsDihedral[i];
           
           // Extraindo os valores das constantes
           let partes = [A.type, B.type, C.type, D.type];
           partes.sort();
-          const key = partes.join('-');
-
+          let key = partes.join('-');
+    
+          // Tentativas de encontrar a chave correta
+          let possibleKeys = [
+            key,                                           // Ex: CT1-CT3-HA-NH1
+            `${partes[0]}-${partes[1]}-${partes[2]}-X`,    // Ex: CT1-CT3-HA-X
+            `${partes[0]}-${partes[1]}-X-X`,               // Ex: CT1-CT3-X-X
+            `${partes[0]}-X-X-X`,                          // Ex: CT1-X-X-X
+            `X-X-X-X`                                      // Ex: X-X-X-X (fallback final)
+          ];
+    
+          let foundKey = null;
+    
+          // Busca a primeira chave que exista nas constantes
+          for (let k of possibleKeys) {
+            if (dihedralConsts.hasOwnProperty(k)) {
+              foundKey = k;
+              break;
+            }
+          }
+    
+          if (!foundKey) {
+            //console.error(`Nenhuma constante encontrada para as combinações de: ${key}`);
+            continue;  // Pula para a próxima iteração, se nenhuma chave for encontrada
+          }
+    
           // CONSTANTES PARA FORÇA DIEDRO
-          const Kchi = dihedralConsts[key].Kchi;  // <-- CONSTANTE DE FORÇA DIEDRO
-          const phi0 = Kchi * (1 + Math.cos(dihedralConsts[key].n - (dihedralConsts[key].delta * (Math.PI / 180))));  // <-- ÂNGULO DIEDRO EQUILÍBRIO
-
-          console.log('Kchi: ', Kchi)
-          console.log('phi0: ', phi0)
+          const Kchi = dihedralConsts[foundKey].Kchi;  // <-- CONSTANTE DE FORÇA DIEDRO
+          const phi0 = Kchi * (1 + Math.cos(dihedralConsts[foundKey].n - (dihedralConsts[foundKey].delta * (Math.PI / 180))));  // <-- ÂNGULO DIEDRO EQUILÍBRIO
           
           // Posições dos átomos
           const rA = [A.x, A.y, A.z];
           const rB = [B.x, B.y, B.z];
           const rC = [C.x, C.y, C.z];
           const rD = [D.x, D.y, D.z];
-
+    
           // Calcular forças diedras
           const { F_A, F_BC, F_D } = calculateDihedralForces(rA, rB, rC, rD, Kchi, phi0);
           
@@ -1383,21 +1404,22 @@ function dihedralLink(links, connectionsDihedral){
           A.force_x += F_A[0];
           A.force_y += F_A[1];
           A.force_z += F_A[2];
-
+    
           B.force_x += F_BC[0];
           B.force_y += F_BC[1];
           B.force_z += F_BC[2];
-
+    
           C.force_x += F_BC[0];
           C.force_y += F_BC[1];
           C.force_z += F_BC[2];
-
+    
           D.force_x += F_D[0];
           D.force_y += F_D[1];
           D.force_z += F_D[2];
         }
       }
     }
+    
 
     // Chama a função para aplicar as forças diedras
     applyDihedralForces(nodes, connectionsDihedral);
@@ -1564,11 +1586,6 @@ function applyAngularForces(nodes, links) {
 			  const A = nodes[connections[i][j]];
 			  const B = nodes[i];
 			  const C = nodes[connections[i][k]];
-
-        console.log('A: ', A)
-        console.log('B: ', B)
-        console.log('C: ', C)
-
             // Extraindo os valores dos tipos das constantes
     let partes = [A.type, B.type, C.type];
 
@@ -1580,9 +1597,6 @@ function applyAngularForces(nodes, links) {
 
     const kTheta = angularConsts[key].Ktheta;
     const theta0 = angularConsts[key].Theta0;
-
-    console.log('kTheta :', kTheta)
-    console.log('theta0: ', theta0)
 			  
 			  // Posições dos átomos
 			  const rA = [A.x, A.y, A.z];
@@ -1614,7 +1628,6 @@ function applyAngularForces(nodes, links) {
   }
 }
 
-console.log(connections)
 
 applyAngularForces(nodes, links);
 
